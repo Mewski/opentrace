@@ -59,7 +59,7 @@ export const VERDI_KEYBOARD_CONFIG: Partial<OpenTraceConfig['keyboard']> = {
     zoomStart: 'home',
     zoomEnd: 'end',
     selectAll: 'ctrl+a',
-    deleteSignal: 'delete',
+    deleteSignal: 'delete'
 };
 
 const defaultConfig: OpenTraceConfig = {

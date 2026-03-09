@@ -24,7 +24,7 @@ export function activate(context: vscode.ExtensionContext): void {
     context.subscriptions.push(
         vscode.window.createTreeView('opentrace.signalTree', {
             treeDataProvider: signalTreeProvider,
-            showCollapseAll: true,
+            showCollapseAll: true
         })
     );
 

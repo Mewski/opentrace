@@ -30,7 +30,7 @@ class SignalTreeItem extends vscode.TreeItem {
             node.name,
             hasChildren || isScope
                 ? vscode.TreeItemCollapsibleState.Collapsed
-                : vscode.TreeItemCollapsibleState.None,
+                : vscode.TreeItemCollapsibleState.None
         );
 
         if (isScope) {

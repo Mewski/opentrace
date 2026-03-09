@@ -13,7 +13,7 @@ function simpleHash(str: string): string {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(16);
@@ -179,9 +179,10 @@ class VCDEditor extends Disposable {
 
                     case 'hierarchy': {
                         try {
-                            const nodes = typeof message.detail === 'string'
-                                ? JSON.parse(message.detail)
-                                : message.detail;
+                            const nodes =
+                                typeof message.detail === 'string'
+                                    ? JSON.parse(message.detail)
+                                    : message.detail;
                             this._hierarchy = nodes;
                             this.manager.setHierarchy(nodes);
                         } catch (e) {
@@ -340,9 +341,7 @@ class VCDEditor extends Disposable {
 
         // Binary formats or small text files: send in one message
         if (this.isBinaryFormat() || data.byteLength <= VCDEditor.CHUNK_THRESHOLD) {
-            const value = this.isBinaryFormat()
-                ? data
-                : new TextDecoder('utf-8').decode(data);
+            const value = this.isBinaryFormat() ? data : new TextDecoder('utf-8').decode(data);
             const type = isReload ? 'reload' : 'parse';
             await this.webviewEditor.webview.postMessage({ type, value });
             return;

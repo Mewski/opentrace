@@ -210,7 +210,6 @@ let Radix: any;
 let License: any;
 let Machine: any;
 let VCD: any;
-let VCDNode: any;
 
 suite('Core module initialization', () => {
     test('default export is a function', () => {
@@ -235,7 +234,6 @@ suite('Core module initialization', () => {
         License = core.License;
         Machine = core.Machine;
         VCD = core.VCD;
-        VCDNode = core.VCDNode;
     });
 });
 
@@ -250,7 +248,7 @@ suite('Radix enum', () => {
     test('Float is 7', () => assert.strictEqual(Radix.Float, 7));
 
     test('enum has exactly 8 entries', () => {
-        const keys = Object.keys(Radix).filter(k => typeof Radix[k] === 'number');
+        const keys = Object.keys(Radix).filter((k) => typeof Radix[k] === 'number');
         assert.strictEqual(keys.length, 8);
     });
 });
@@ -370,7 +368,7 @@ suite('Timescale parsing – all units', () => {
         ['us', 2],
         ['ns', 3],
         ['ps', 4],
-        ['fs', 5],
+        ['fs', 5]
     ];
 
     unitMap.forEach(([unit, expected]) => {
@@ -385,7 +383,7 @@ suite('Timescale parsing – all units', () => {
 });
 
 suite('Timescale parsing – multipliers', () => {
-    [1, 10, 100].forEach(mult => {
+    [1, 10, 100].forEach((mult) => {
         test(`multiplier ${mult}`, () => {
             const vcd = new VCD();
             const ok = vcd.parse(VCD_TIMESCALE_ONLY(String(mult), 'ns'));
@@ -399,7 +397,7 @@ suite('Timescale parsing – multipliers', () => {
 suite('Timescale setter', () => {
     test('set timescale from string "1ns"', () => {
         const vcd = new VCD();
-        const ok = vcd.timescale = '1ns';
+        vcd.timescale = '1ns';
         assert.strictEqual(vcd.timescale_unit, 3);
         assert.strictEqual(vcd.timescale_mult, 1);
         vcd.free();
@@ -1645,7 +1643,16 @@ suite('get_trace_label – single-bit with various radixes', () => {
     });
 
     test('single-bit signal returns "0" or "1" regardless of radix', () => {
-        const radixes = [Radix.Bin, Radix.Oct, Radix.Hex, Radix.Signed, Radix.Unsigned, Radix.ASCII, Radix.UTF8, Radix.Float];
+        const radixes = [
+            Radix.Bin,
+            Radix.Oct,
+            Radix.Hex,
+            Radix.Signed,
+            Radix.Unsigned,
+            Radix.ASCII,
+            Radix.UTF8,
+            Radix.Float
+        ];
         for (const r of radixes) {
             vcd.set_radix('!', r);
             const label0 = vcd.get_trace_label('!', 0);
@@ -1658,7 +1665,16 @@ suite('get_trace_label – single-bit with various radixes', () => {
     test('single-bit x/z returns "x"/"z" regardless of radix', () => {
         const vcd2 = new VCD();
         vcd2.parse(VCD_XZ_VALUES);
-        const radixes = [Radix.Bin, Radix.Oct, Radix.Hex, Radix.Signed, Radix.Unsigned, Radix.ASCII, Radix.UTF8, Radix.Float];
+        const radixes = [
+            Radix.Bin,
+            Radix.Oct,
+            Radix.Hex,
+            Radix.Signed,
+            Radix.Unsigned,
+            Radix.ASCII,
+            Radix.UTF8,
+            Radix.Float
+        ];
         for (const r of radixes) {
             vcd2.set_radix('!', r);
             const labelX = vcd2.get_trace_label('!', 0);
@@ -2213,8 +2229,10 @@ suite('set_radix – signal isolation', () => {
         // integer signal # should still be hex (default)
         const intLabel = vcd2.get_trace_label('#', 1);
         // default radix is Hex, so 0000000a
-        assert.ok(!intLabel.includes('1010') || intLabel.length !== regLabel.length,
-            'integer signal should not be affected by reg radix change');
+        assert.ok(
+            !intLabel.includes('1010') || intLabel.length !== regLabel.length,
+            'integer signal should not be affected by reg radix change'
+        );
         vcd2.free();
     });
 
@@ -2244,8 +2262,10 @@ suite('get_trace_label – large bit widths', () => {
     test('64-bit all-0s in hex is a single or padded 0', () => {
         vcd.set_radix('!', Radix.Hex);
         const label = vcd.get_trace_label('!', 0).toLowerCase();
-        assert.ok(label === '0000000000000000' || label === '0',
-            `expected all zeros, got "${label}"`);
+        assert.ok(
+            label === '0000000000000000' || label === '0',
+            `expected all zeros, got "${label}"`
+        );
     });
 
     test('64-bit all-1s in unsigned decimal is 18446744073709551615', () => {
@@ -2269,7 +2289,10 @@ suite('get_trace_label – large bit widths', () => {
     test('64-bit value in binary', () => {
         vcd.set_radix('!', Radix.Bin);
         const label = vcd.get_trace_label('!', 1);
-        assert.strictEqual(label, '1111111111111111111111111111111111111111111111111111111111111111');
+        assert.strictEqual(
+            label,
+            '1111111111111111111111111111111111111111111111111111111111111111'
+        );
     });
 });
 
