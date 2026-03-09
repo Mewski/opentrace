@@ -146,6 +146,37 @@ export class OtApp {
   }
 
   /**
+   * Parse a binary waveform file (FST, GHW, or binary VCD) using the wellen backend.
+   */
+  @Method()
+  async parseBytes(data: Uint8Array): Promise<void> {
+    if (vcd.parse_bytes(data)) {
+      this.defined = true;
+      const nodes: Signal[] = JSON.parse(vcd.nodes());
+      this.search().load(nodes);
+
+      this.log.emit(
+        JSON.stringify({
+          detail: `[INFO] Date: ${vcd.date}\n[INFO] Version: ${vcd.version}\n[INFO] Found ${nodes.length} signals\n`,
+          focus: false,
+        }),
+      );
+    } else {
+      this.log.emit(
+        JSON.stringify({
+          detail: vcd.message,
+          focus: true,
+        }),
+      );
+      this.error = true;
+    }
+
+    this.canvas().fileChanged = false;
+    this.canvas().draw();
+    this.vcdDone.emit();
+  }
+
+  /**
    * Import signals from a JSON string (e.g. saved workspace).
    */
   @Method()

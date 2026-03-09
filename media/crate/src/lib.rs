@@ -6,6 +6,7 @@ mod parser;
 mod radix;
 mod tree;
 mod types;
+mod wellen_adapter;
 
 use types::*;
 
@@ -474,6 +475,10 @@ impl VCD {
 
     pub fn parse(&mut self, input: &str) -> bool {
         parser::parse_vcd(input, self)
+    }
+
+    pub fn parse_bytes(&mut self, input: &[u8]) -> bool {
+        wellen_adapter::parse_with_wellen(input, self)
     }
 
     pub fn reset(&mut self) {

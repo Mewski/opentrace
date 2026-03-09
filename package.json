@@ -36,6 +36,12 @@
                 "selector": [
                     {
                         "filenamePattern": "*.vcd"
+                    },
+                    {
+                        "filenamePattern": "*.fst"
+                    },
+                    {
+                        "filenamePattern": "*.ghw"
                     }
                 ]
             }

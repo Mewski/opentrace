@@ -52,6 +52,16 @@ suite('Package manifest', () => {
         assert.ok(editor.selector.some((s: any) => s.filenamePattern === '*.vcd'));
     });
 
+    test('registers FST file association', () => {
+        const editor = pkg.contributes.customEditors[0];
+        assert.ok(editor.selector.some((s: any) => s.filenamePattern === '*.fst'));
+    });
+
+    test('registers GHW file association', () => {
+        const editor = pkg.contributes.customEditors[0];
+        assert.ok(editor.selector.some((s: any) => s.filenamePattern === '*.ghw'));
+    });
+
     test('has build scripts', () => {
         assert.ok(pkg.scripts['vscode:prepublish']);
         assert.ok(pkg.scripts.compile);

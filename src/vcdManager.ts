@@ -236,9 +236,17 @@ class VCDEditor extends Disposable {
         }
     }
 
-    private async read(): Promise<string> {
+    private isBinaryFormat(): boolean {
+        const p = this.resource.path.toLowerCase();
+        return p.endsWith('.fst') || p.endsWith('.ghw');
+    }
+
+    private async read(): Promise<string | Uint8Array> {
         this._log.appendLine('[INFO] Reading ' + this.resource.path);
         const data = await vscode.workspace.fs.readFile(this.resource);
+        if (this.isBinaryFormat()) {
+            return data;
+        }
         return new TextDecoder('utf-8').decode(data);
     }
 

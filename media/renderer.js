@@ -75,7 +75,14 @@
 
             case 'parse':
                 // @ts-ignore
-                app.parse(e.data.value);
+                if (e.data.value instanceof Uint8Array || e.data.value instanceof ArrayBuffer) {
+                    const bytes = e.data.value instanceof ArrayBuffer
+                        ? new Uint8Array(e.data.value)
+                        : e.data.value;
+                    app.parseBytes(bytes);
+                } else {
+                    app.parse(e.data.value);
+                }
                 break;
             
             case 'clear':
@@ -104,8 +111,15 @@
                 app.clear();
 
                 // @ts-ignore
-                app.parse(e.data.value);
-                
+                if (e.data.value instanceof Uint8Array || e.data.value instanceof ArrayBuffer) {
+                    const bytes = e.data.value instanceof ArrayBuffer
+                        ? new Uint8Array(e.data.value)
+                        : e.data.value;
+                    app.parseBytes(bytes);
+                } else {
+                    app.parse(e.data.value);
+                }
+
                 // @ts-ignore
                 app.import(temp);
 

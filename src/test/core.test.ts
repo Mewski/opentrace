@@ -2415,3 +2415,233 @@ $enddefinitions $end
         vcd.free();
     });
 });
+
+// ---------------------------------------------------------------------------
+// parse_bytes – wellen backend tests
+// ---------------------------------------------------------------------------
+
+suite('parse_bytes – wellen VCD parsing', () => {
+    test('parse_bytes returns true on valid VCD', () => {
+        const vcd = new VCD();
+        const bytes = new TextEncoder().encode(VCD_BASIC);
+        const result = vcd.parse_bytes(bytes);
+        assert.strictEqual(result, true);
+        vcd.free();
+    });
+
+    test('parse_bytes returns false on empty input', () => {
+        const vcd = new VCD();
+        const result = vcd.parse_bytes(new Uint8Array(0));
+        assert.strictEqual(result, false);
+        vcd.free();
+    });
+
+    test('parse_bytes extracts date', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        assert.ok(vcd.date.includes('Mon Jan 1'));
+        vcd.free();
+    });
+
+    test('parse_bytes extracts version', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        assert.ok(vcd.version.includes('VCD generator'));
+        vcd.free();
+    });
+
+    test('parse_bytes extracts timescale', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        assert.strictEqual(vcd.timescale_unit, 3); // ns
+        assert.strictEqual(vcd.timescale_mult, 1);
+        vcd.free();
+    });
+
+    test('parse_bytes extracts simulation end time', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        assert.strictEqual(vcd.time, 20);
+        vcd.free();
+    });
+
+    test('parse_bytes finds all signals', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        assert.strictEqual(vcd.get_signal_count(), 3);
+        vcd.free();
+    });
+
+    test('parse_bytes builds scope hierarchy', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        const nodes = JSON.parse(vcd.nodes());
+        assert.ok(Array.isArray(nodes));
+        assert.ok(nodes.length > 0);
+        // Should have a top-level scope
+        assert.strictEqual(nodes[0].name, 'top');
+        vcd.free();
+    });
+
+    test('parse_bytes signal tids are accessible from nodes', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        const nodes = JSON.parse(vcd.nodes());
+        const flatten = (n: any[]): any[] =>
+            n.reduce((acc: any[], node: any) => {
+                acc.push(node);
+                if (node.children) acc.push(...flatten(node.children));
+                return acc;
+            }, []);
+        const all = flatten(nodes);
+        const signals = all.filter((n: any) => n.tid !== undefined);
+        assert.strictEqual(signals.length, 3);
+        // Each signal should have a tid starting with "w" (wellen synthetic)
+        for (const sig of signals) {
+            assert.ok(sig.tid.startsWith('w'), `tid "${sig.tid}" should start with "w"`);
+        }
+        vcd.free();
+    });
+
+    test('parse_bytes signal trace data is accessible', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        const nodes = JSON.parse(vcd.nodes());
+        const flatten = (n: any[]): any[] =>
+            n.reduce((acc: any[], node: any) => {
+                acc.push(node);
+                if (node.children) acc.push(...flatten(node.children));
+                return acc;
+            }, []);
+        const all = flatten(nodes);
+        const clkNode = all.find((n: any) => n.name === 'clk');
+        assert.ok(clkNode, 'clk signal should exist');
+        const len = vcd.get_trace_length(clkNode.tid);
+        assert.ok(len >= 1, `clk should have trace entries, got ${len}`);
+        vcd.free();
+    });
+
+    test('parse_bytes trace times match VCD timestamps', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        const nodes = JSON.parse(vcd.nodes());
+        const flatten = (n: any[]): any[] =>
+            n.reduce((acc: any[], node: any) => {
+                acc.push(node);
+                if (node.children) acc.push(...flatten(node.children));
+                return acc;
+            }, []);
+        const all = flatten(nodes);
+        const clkNode = all.find((n: any) => n.name === 'clk');
+        assert.ok(clkNode);
+        const len = vcd.get_trace_length(clkNode.tid);
+        const times: number[] = [];
+        for (let i = 0; i < len; i++) {
+            times.push(vcd.get_trace_time(clkNode.tid, i));
+        }
+        assert.strictEqual(times[0], 0);
+        assert.ok(times.includes(5));
+        assert.ok(times.includes(10));
+        assert.ok(times.includes(15));
+        assert.ok(times.includes(20));
+        vcd.free();
+    });
+
+    test('parse_bytes multi-bit signal labels work', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        const nodes = JSON.parse(vcd.nodes());
+        const flatten = (n: any[]): any[] =>
+            n.reduce((acc: any[], node: any) => {
+                acc.push(node);
+                if (node.children) acc.push(...flatten(node.children));
+                return acc;
+            }, []);
+        const all = flatten(nodes);
+        const dataNode = all.find((n: any) => n.name === 'data');
+        assert.ok(dataNode, 'data signal should exist');
+        vcd.set_radix(dataNode.tid, Radix.Hex);
+        const label = vcd.get_trace_label(dataNode.tid, 0);
+        assert.ok(typeof label === 'string');
+        assert.ok(label.length > 0);
+        vcd.free();
+    });
+
+    test('parse_bytes nested scopes are preserved', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_NESTED_SCOPES));
+        const nodes = JSON.parse(vcd.nodes());
+        assert.ok(nodes.length > 0);
+        assert.strictEqual(nodes[0].name, 'chip');
+        assert.ok(nodes[0].children.length >= 2);
+        vcd.free();
+    });
+
+    test('parse_bytes real signals work', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_MULTI_TYPE));
+        const nodes = JSON.parse(vcd.nodes());
+        const flatten = (n: any[]): any[] =>
+            n.reduce((acc: any[], node: any) => {
+                acc.push(node);
+                if (node.children) acc.push(...flatten(node.children));
+                return acc;
+            }, []);
+        const all = flatten(nodes);
+        const realNode = all.find((n: any) => n.name === 'f');
+        assert.ok(realNode, 'real signal f should exist');
+        const len = vcd.get_trace_length(realNode.tid);
+        assert.ok(len >= 1);
+        vcd.free();
+    });
+
+    test('parse_bytes x/z values are preserved', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_XZ_VALUES));
+        const nodes = JSON.parse(vcd.nodes());
+        const flatten = (n: any[]): any[] =>
+            n.reduce((acc: any[], node: any) => {
+                acc.push(node);
+                if (node.children) acc.push(...flatten(node.children));
+                return acc;
+            }, []);
+        const all = flatten(nodes);
+        const signals = all.filter((n: any) => n.tid !== undefined);
+        assert.ok(signals.length >= 2);
+        // Check that trace data exists for x/z signal
+        for (const sig of signals) {
+            const len = vcd.get_trace_length(sig.tid);
+            assert.ok(len >= 1, `signal ${sig.name} should have trace entries`);
+        }
+        vcd.free();
+    });
+
+    test('parse_bytes timescale ps unit works', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_MULTI_TYPE));
+        assert.strictEqual(vcd.timescale_unit, 4); // ps
+        assert.strictEqual(vcd.timescale_mult, 1);
+        vcd.free();
+    });
+
+    test('parse_bytes after clear replaces data', () => {
+        const vcd = new VCD();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_BASIC));
+        assert.strictEqual(vcd.get_signal_count(), 3);
+        vcd.clear();
+        vcd.parse_bytes(new TextEncoder().encode(VCD_MULTI_TYPE));
+        assert.strictEqual(vcd.get_signal_count(), 4);
+        vcd.free();
+    });
+
+    test('parse_bytes can be used after parse (mix backends)', () => {
+        const vcd = new VCD();
+        // Parse with custom parser first
+        vcd.parse(VCD_BASIC);
+        assert.strictEqual(vcd.get_signal_count(), 3);
+        // Then parse with wellen backend
+        vcd.parse_bytes(new TextEncoder().encode(VCD_MULTI_TYPE));
+        assert.strictEqual(vcd.get_signal_count(), 4);
+        vcd.free();
+    });
+});
