@@ -7,6 +7,8 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AppConfig, Signal, SignalDisplay } from "./utils/types";
 import { Viewport } from "./components/wt-canvas-nav/wt-canvas-nav";
+export { AppConfig, Signal, SignalDisplay } from "./utils/types";
+export { Viewport } from "./components/wt-canvas-nav/wt-canvas-nav";
 export namespace Components {
     /**
      * Color selection widget.
@@ -17,15 +19,18 @@ export namespace Components {
     interface ColorPicker {
         /**
           * The currently selected CSS color string.
+          * @default 'red'
          */
         "color": string;
         /**
           * Fill opacity (0 = transparent, 1 = fully opaque).
+          * @default 0.5
          */
         "fill": number;
         "hide": () => Promise<void>;
         /**
           * Array of CSS color strings to show in the swatch palette.
+          * @default DEFAULT_CONFIG.theme.palette
          */
         "palette": string[];
     }
@@ -71,13 +76,14 @@ export namespace Components {
         /**
           * Application configuration (keyboard, mouse, display settings).
          */
-        "config": AppConfig;
+        "config"?: AppConfig;
         /**
           * Remove one or more signals by id.
          */
         "delete": (...signals: Signal[]) => Promise<void>;
         /**
           * Whether the backing waveform file has changed on disk.
+          * @default false
          */
         "fileChanged": boolean;
         /**
@@ -110,6 +116,7 @@ export namespace Components {
     interface WtCanvasNav {
         /**
           * Whether the backing file has changed on disk (highlights the reload button).
+          * @default false
          */
         "fileChanged": boolean;
         /**
@@ -130,6 +137,7 @@ export namespace Components {
     interface WtProperties {
         /**
           * The set of currently selected signals whose properties are shown/edited.
+          * @default []
          */
         "signals": Signal[];
     }
@@ -150,6 +158,7 @@ export namespace Components {
         "load": (dict: any[]) => Promise<void>;
         /**
           * Horizontal offset for positioning.
+          * @default 0
          */
         "offsetX": number;
         /**
@@ -172,6 +181,7 @@ export namespace Components {
     interface WtSettings {
         /**
           * The application config object (passed by reference from the host).
+          * @default null
          */
         "config": AppConfig | null;
         /**
@@ -199,10 +209,12 @@ export namespace Components {
         "clearSelection": () => Promise<void>;
         /**
           * Whether the waveform definition file has been fully parsed.
+          * @default false
          */
         "defined": boolean;
         /**
           * Whether there was an error loading the file.
+          * @default false
          */
         "error": boolean;
         /**
@@ -225,6 +237,9 @@ export namespace Components {
           * Select all signals.
          */
         "selectAll": () => Promise<void>;
+        /**
+          * @default []
+         */
         "signals": Signal[];
         /**
           * Update cursor values for all visible signals.
@@ -250,6 +265,7 @@ export namespace Components {
         "signal": Signal;
         /**
           * Current cursor value for this signal (displayed in the radix column).
+          * @default ''
          */
         "value": string;
     }
@@ -264,6 +280,7 @@ export namespace Components {
     interface WtSidebarList {
         /**
           * Signal items to display. The setter copies the reference and triggers a re-render.
+          * @default []
          */
         "signals": Signal[];
     }
@@ -277,10 +294,12 @@ export namespace Components {
     interface WtSidebarProp {
         /**
           * Bit-width of the signal (controls which renderer buttons are shown).
+          * @default 0
          */
         "busSize": number;
         /**
           * Display options for the signal being edited.
+          * @default {} as SignalDisplay
          */
         "options": SignalDisplay;
     }
@@ -294,12 +313,14 @@ export namespace Components {
     interface WtSidebarRadix {
         /**
           * Display options (contains `.radix` and `.color`).
+          * @default {} as SignalDisplay
          */
         "options": SignalDisplay;
     }
     interface WtWindow {
         /**
           * When true, applies a backdrop blur effect behind the window.
+          * @default false
          */
         "backgroundBlur": boolean;
         /**
@@ -312,10 +333,12 @@ export namespace Components {
         "show": () => Promise<void>;
         /**
           * Controls visibility of the modal overlay.
+          * @default false
          */
         "visible": boolean;
         /**
           * Title displayed in the gradient title bar. Empty string hides the bar.
+          * @default ''
          */
         "windowTitle": string;
     }
@@ -365,6 +388,9 @@ export interface WtSidebarRadixCustomEvent<T> extends CustomEvent<T> {
     target: HTMLWtSidebarRadixElement;
 }
 declare global {
+    interface HTMLColorPickerElementEventMap {
+        "change": { color: string; fill: number };
+    }
     /**
      * Color selection widget.
      * Displays a small color swatch that, when clicked, opens a dropdown
@@ -372,23 +398,67 @@ declare global {
      * Emits a `change` event whenever a color or fill value is modified.
      */
     interface HTMLColorPickerElement extends Components.ColorPicker, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLColorPickerElementEventMap>(type: K, listener: (this: HTMLColorPickerElement, ev: ColorPickerCustomEvent<HTMLColorPickerElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLColorPickerElementEventMap>(type: K, listener: (this: HTMLColorPickerElement, ev: ColorPickerCustomEvent<HTMLColorPickerElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLColorPickerElement: {
         prototype: HTMLColorPickerElement;
         new (): HTMLColorPickerElement;
     };
+    interface HTMLWtAppElementEventMap {
+        "vcd-ready": void;
+        "vcd-done": void;
+        "log": string;
+        "file-reload": {};
+        "config-save": string;
+        "config-reset": {};
+        "config-reload": {};
+        "settings-json": {};
+        "open-website": {};
+    }
     interface HTMLWtAppElement extends Components.WtApp, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtAppElementEventMap>(type: K, listener: (this: HTMLWtAppElement, ev: WtAppCustomEvent<HTMLWtAppElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtAppElementEventMap>(type: K, listener: (this: HTMLWtAppElement, ev: WtAppCustomEvent<HTMLWtAppElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtAppElement: {
         prototype: HTMLWtAppElement;
         new (): HTMLWtAppElement;
     };
+    interface HTMLWtCanvasElementEventMap {
+        "setCursor": Record<string, string>;
+        "settings": void;
+    }
     interface HTMLWtCanvasElement extends Components.WtCanvas, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtCanvasElementEventMap>(type: K, listener: (this: HTMLWtCanvasElement, ev: WtCanvasCustomEvent<HTMLWtCanvasElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtCanvasElementEventMap>(type: K, listener: (this: HTMLWtCanvasElement, ev: WtCanvasCustomEvent<HTMLWtCanvasElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtCanvasElement: {
         prototype: HTMLWtCanvasElement;
         new (): HTMLWtCanvasElement;
     };
+    interface HTMLWtCanvasNavElementEventMap {
+        "change": { cmd: string; value?: number };
+        "file-reload": {};
+        "settings": {};
+    }
     /**
      * Navigation bar displayed above the waveform canvas.
      * Provides zoom controls (in / out / fit), a reload button,
@@ -396,11 +466,22 @@ declare global {
      * viewport position within the full waveform.
      */
     interface HTMLWtCanvasNavElement extends Components.WtCanvasNav, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtCanvasNavElementEventMap>(type: K, listener: (this: HTMLWtCanvasNavElement, ev: WtCanvasNavCustomEvent<HTMLWtCanvasNavElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtCanvasNavElementEventMap>(type: K, listener: (this: HTMLWtCanvasNavElement, ev: WtCanvasNavCustomEvent<HTMLWtCanvasNavElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtCanvasNavElement: {
         prototype: HTMLWtCanvasNavElement;
         new (): HTMLWtCanvasNavElement;
     };
+    interface HTMLWtPropertiesElementEventMap {
+        "redraw": { resize: boolean };
+    }
     /**
      * Properties panel shown below the sidebar.
      * Displays and edits shared display properties for the currently
@@ -408,11 +489,22 @@ declare global {
      * and waveform height.
      */
     interface HTMLWtPropertiesElement extends Components.WtProperties, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtPropertiesElementEventMap>(type: K, listener: (this: HTMLWtPropertiesElement, ev: WtPropertiesCustomEvent<HTMLWtPropertiesElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtPropertiesElementEventMap>(type: K, listener: (this: HTMLWtPropertiesElement, ev: WtPropertiesCustomEvent<HTMLWtPropertiesElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtPropertiesElement: {
         prototype: HTMLWtPropertiesElement;
         new (): HTMLWtPropertiesElement;
     };
+    interface HTMLWtSearchElementEventMap {
+        "add": Signal[];
+    }
     /**
      * Modal dialog for browsing and adding VCD signals to the waveform display.
      * Shows a hierarchical module tree on the left and a filterable signal list
@@ -420,11 +512,25 @@ declare global {
      * and type-based filtering (wire, reg, logic, etc.).
      */
     interface HTMLWtSearchElement extends Components.WtSearch, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtSearchElementEventMap>(type: K, listener: (this: HTMLWtSearchElement, ev: WtSearchCustomEvent<HTMLWtSearchElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtSearchElementEventMap>(type: K, listener: (this: HTMLWtSearchElement, ev: WtSearchCustomEvent<HTMLWtSearchElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtSearchElement: {
         prototype: HTMLWtSearchElement;
         new (): HTMLWtSearchElement;
     };
+    interface HTMLWtSettingsElementEventMap {
+        "config-save": string;
+        "settings-json": {};
+        "config-reload": {};
+        "config-reset": {};
+    }
     /**
      * Settings panel component.
      * Provides tabbed UI for:
@@ -434,11 +540,26 @@ declare global {
      * All licensing / activation functionality has been removed.
      */
     interface HTMLWtSettingsElement extends Components.WtSettings, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtSettingsElementEventMap>(type: K, listener: (this: HTMLWtSettingsElement, ev: WtSettingsCustomEvent<HTMLWtSettingsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtSettingsElementEventMap>(type: K, listener: (this: HTMLWtSettingsElement, ev: WtSettingsCustomEvent<HTMLWtSettingsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtSettingsElement: {
         prototype: HTMLWtSettingsElement;
         new (): HTMLWtSettingsElement;
     };
+    interface HTMLWtSidebarElementEventMap {
+        "add": void;
+        "delete": void;
+        "waveformChanged": void;
+        "redraw": { resize?: boolean };
+        "setActiveSignal": number;
+    }
     /**
      * Main sidebar container for the signal list.
      * Manages:
@@ -449,11 +570,22 @@ declare global {
      *  - Delegates to `wt-properties` for bulk property editing.
      */
     interface HTMLWtSidebarElement extends Components.WtSidebar, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtSidebarElementEventMap>(type: K, listener: (this: HTMLWtSidebarElement, ev: WtSidebarCustomEvent<HTMLWtSidebarElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtSidebarElementEventMap>(type: K, listener: (this: HTMLWtSidebarElement, ev: WtSidebarCustomEvent<HTMLWtSidebarElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtSidebarElement: {
         prototype: HTMLWtSidebarElement;
         new (): HTMLWtSidebarElement;
     };
+    interface HTMLWtSidebarItemElementEventMap {
+        "resizeSignals": void;
+    }
     /**
      * Renders a single signal row inside the sidebar.
      * For **group** signals it shows a group header with an editable alias
@@ -463,6 +595,14 @@ declare global {
      * signal name (with scope), and the current value display.
      */
     interface HTMLWtSidebarItemElement extends Components.WtSidebarItem, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtSidebarItemElementEventMap>(type: K, listener: (this: HTMLWtSidebarItemElement, ev: WtSidebarItemCustomEvent<HTMLWtSidebarItemElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtSidebarItemElementEventMap>(type: K, listener: (this: HTMLWtSidebarItemElement, ev: WtSidebarItemCustomEvent<HTMLWtSidebarItemElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtSidebarItemElement: {
         prototype: HTMLWtSidebarItemElement;
@@ -482,6 +622,10 @@ declare global {
         prototype: HTMLWtSidebarListElement;
         new (): HTMLWtSidebarListElement;
     };
+    interface HTMLWtSidebarPropElementEventMap {
+        "waveformChanged": SignalDisplay;
+        "resizeSignals": void;
+    }
     /**
      * Inline property editor for a single signal.
      * Displays a color picker, renderer-type toggle buttons
@@ -490,11 +634,24 @@ declare global {
      * parent can update the canvas.
      */
     interface HTMLWtSidebarPropElement extends Components.WtSidebarProp, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtSidebarPropElementEventMap>(type: K, listener: (this: HTMLWtSidebarPropElement, ev: WtSidebarPropCustomEvent<HTMLWtSidebarPropElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtSidebarPropElementEventMap>(type: K, listener: (this: HTMLWtSidebarPropElement, ev: WtSidebarPropCustomEvent<HTMLWtSidebarPropElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtSidebarPropElement: {
         prototype: HTMLWtSidebarPropElement;
         new (): HTMLWtSidebarPropElement;
     };
+    interface HTMLWtSidebarRadixElementEventMap {
+        "waveformChanged": SignalDisplay;
+        "select": void;
+        "resizeSignals": void;
+    }
     /**
      * Dropdown menu for selecting the display radix of a signal value.
      * Lists all `Radix` members (bin, oct, hex, unsigned, signed, ascii,
@@ -503,6 +660,14 @@ declare global {
      * parent know a choice was made (so it can close the dropdown).
      */
     interface HTMLWtSidebarRadixElement extends Components.WtSidebarRadix, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLWtSidebarRadixElementEventMap>(type: K, listener: (this: HTMLWtSidebarRadixElement, ev: WtSidebarRadixCustomEvent<HTMLWtSidebarRadixElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLWtSidebarRadixElementEventMap>(type: K, listener: (this: HTMLWtSidebarRadixElement, ev: WtSidebarRadixCustomEvent<HTMLWtSidebarRadixElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLWtSidebarRadixElement: {
         prototype: HTMLWtSidebarRadixElement;
@@ -540,10 +705,12 @@ declare namespace LocalJSX {
     interface ColorPicker {
         /**
           * The currently selected CSS color string.
+          * @default 'red'
          */
         "color"?: string;
         /**
           * Fill opacity (0 = transparent, 1 = fully opaque).
+          * @default 0.5
          */
         "fill"?: number;
         /**
@@ -552,6 +719,7 @@ declare namespace LocalJSX {
         "onChange"?: (event: ColorPickerCustomEvent<{ color: string; fill: number }>) => void;
         /**
           * Array of CSS color strings to show in the swatch palette.
+          * @default DEFAULT_CONFIG.theme.palette
          */
         "palette"?: string[];
     }
@@ -570,9 +738,10 @@ declare namespace LocalJSX {
         /**
           * Application configuration (keyboard, mouse, display settings).
          */
-        "config": AppConfig;
+        "config"?: AppConfig;
         /**
           * Whether the backing waveform file has changed on disk.
+          * @default false
          */
         "fileChanged"?: boolean;
         /**
@@ -597,6 +766,7 @@ declare namespace LocalJSX {
     interface WtCanvasNav {
         /**
           * Whether the backing file has changed on disk (highlights the reload button).
+          * @default false
          */
         "fileChanged"?: boolean;
         /**
@@ -625,6 +795,7 @@ declare namespace LocalJSX {
         "onRedraw"?: (event: WtPropertiesCustomEvent<{ resize: boolean }>) => void;
         /**
           * The set of currently selected signals whose properties are shown/edited.
+          * @default []
          */
         "signals"?: Signal[];
     }
@@ -637,6 +808,7 @@ declare namespace LocalJSX {
     interface WtSearch {
         /**
           * Horizontal offset for positioning.
+          * @default 0
          */
         "offsetX"?: number;
         /**
@@ -655,6 +827,7 @@ declare namespace LocalJSX {
     interface WtSettings {
         /**
           * The application config object (passed by reference from the host).
+          * @default null
          */
         "config"?: AppConfig | null;
         /**
@@ -686,10 +859,12 @@ declare namespace LocalJSX {
     interface WtSidebar {
         /**
           * Whether the waveform definition file has been fully parsed.
+          * @default false
          */
         "defined"?: boolean;
         /**
           * Whether there was an error loading the file.
+          * @default false
          */
         "error"?: boolean;
         /**
@@ -712,6 +887,9 @@ declare namespace LocalJSX {
           * Emitted when signals are reordered, properties change, etc.
          */
         "onWaveformChanged"?: (event: WtSidebarCustomEvent<void>) => void;
+        /**
+          * @default []
+         */
         "signals"?: Signal[];
     }
     /**
@@ -733,6 +911,7 @@ declare namespace LocalJSX {
         "signal": Signal;
         /**
           * Current cursor value for this signal (displayed in the radix column).
+          * @default ''
          */
         "value"?: string;
     }
@@ -747,6 +926,7 @@ declare namespace LocalJSX {
     interface WtSidebarList {
         /**
           * Signal items to display. The setter copies the reference and triggers a re-render.
+          * @default []
          */
         "signals"?: Signal[];
     }
@@ -760,6 +940,7 @@ declare namespace LocalJSX {
     interface WtSidebarProp {
         /**
           * Bit-width of the signal (controls which renderer buttons are shown).
+          * @default 0
          */
         "busSize"?: number;
         /**
@@ -772,6 +953,7 @@ declare namespace LocalJSX {
         "onWaveformChanged"?: (event: WtSidebarPropCustomEvent<SignalDisplay>) => void;
         /**
           * Display options for the signal being edited.
+          * @default {} as SignalDisplay
          */
         "options"?: SignalDisplay;
     }
@@ -797,37 +979,71 @@ declare namespace LocalJSX {
         "onWaveformChanged"?: (event: WtSidebarRadixCustomEvent<SignalDisplay>) => void;
         /**
           * Display options (contains `.radix` and `.color`).
+          * @default {} as SignalDisplay
          */
         "options"?: SignalDisplay;
     }
     interface WtWindow {
         /**
           * When true, applies a backdrop blur effect behind the window.
+          * @default false
          */
         "backgroundBlur"?: boolean;
         /**
           * Controls visibility of the modal overlay.
+          * @default false
          */
         "visible"?: boolean;
         /**
           * Title displayed in the gradient title bar. Empty string hides the bar.
+          * @default ''
          */
         "windowTitle"?: string;
     }
+
+    interface ColorPickerAttributes {
+        "color": string;
+        "fill": number;
+    }
+    interface WtCanvasAttributes {
+        "fileChanged": boolean;
+    }
+    interface WtCanvasNavAttributes {
+        "fileChanged": boolean;
+    }
+    interface WtSearchAttributes {
+        "offsetX": number;
+    }
+    interface WtSidebarAttributes {
+        "defined": boolean;
+        "error": boolean;
+    }
+    interface WtSidebarItemAttributes {
+        "value": string;
+    }
+    interface WtSidebarPropAttributes {
+        "busSize": number;
+    }
+    interface WtWindowAttributes {
+        "windowTitle": string;
+        "backgroundBlur": boolean;
+        "visible": boolean;
+    }
+
     interface IntrinsicElements {
-        "color-picker": ColorPicker;
+        "color-picker": Omit<ColorPicker, keyof ColorPickerAttributes> & { [K in keyof ColorPicker & keyof ColorPickerAttributes]?: ColorPicker[K] } & { [K in keyof ColorPicker & keyof ColorPickerAttributes as `attr:${K}`]?: ColorPickerAttributes[K] } & { [K in keyof ColorPicker & keyof ColorPickerAttributes as `prop:${K}`]?: ColorPicker[K] };
         "wt-app": WtApp;
-        "wt-canvas": WtCanvas;
-        "wt-canvas-nav": WtCanvasNav;
+        "wt-canvas": Omit<WtCanvas, keyof WtCanvasAttributes> & { [K in keyof WtCanvas & keyof WtCanvasAttributes]?: WtCanvas[K] } & { [K in keyof WtCanvas & keyof WtCanvasAttributes as `attr:${K}`]?: WtCanvasAttributes[K] } & { [K in keyof WtCanvas & keyof WtCanvasAttributes as `prop:${K}`]?: WtCanvas[K] };
+        "wt-canvas-nav": Omit<WtCanvasNav, keyof WtCanvasNavAttributes> & { [K in keyof WtCanvasNav & keyof WtCanvasNavAttributes]?: WtCanvasNav[K] } & { [K in keyof WtCanvasNav & keyof WtCanvasNavAttributes as `attr:${K}`]?: WtCanvasNavAttributes[K] } & { [K in keyof WtCanvasNav & keyof WtCanvasNavAttributes as `prop:${K}`]?: WtCanvasNav[K] };
         "wt-properties": WtProperties;
-        "wt-search": WtSearch;
+        "wt-search": Omit<WtSearch, keyof WtSearchAttributes> & { [K in keyof WtSearch & keyof WtSearchAttributes]?: WtSearch[K] } & { [K in keyof WtSearch & keyof WtSearchAttributes as `attr:${K}`]?: WtSearchAttributes[K] } & { [K in keyof WtSearch & keyof WtSearchAttributes as `prop:${K}`]?: WtSearch[K] };
         "wt-settings": WtSettings;
-        "wt-sidebar": WtSidebar;
-        "wt-sidebar-item": WtSidebarItem;
+        "wt-sidebar": Omit<WtSidebar, keyof WtSidebarAttributes> & { [K in keyof WtSidebar & keyof WtSidebarAttributes]?: WtSidebar[K] } & { [K in keyof WtSidebar & keyof WtSidebarAttributes as `attr:${K}`]?: WtSidebarAttributes[K] } & { [K in keyof WtSidebar & keyof WtSidebarAttributes as `prop:${K}`]?: WtSidebar[K] };
+        "wt-sidebar-item": Omit<WtSidebarItem, keyof WtSidebarItemAttributes> & { [K in keyof WtSidebarItem & keyof WtSidebarItemAttributes]?: WtSidebarItem[K] } & { [K in keyof WtSidebarItem & keyof WtSidebarItemAttributes as `attr:${K}`]?: WtSidebarItemAttributes[K] } & { [K in keyof WtSidebarItem & keyof WtSidebarItemAttributes as `prop:${K}`]?: WtSidebarItem[K] };
         "wt-sidebar-list": WtSidebarList;
-        "wt-sidebar-prop": WtSidebarProp;
+        "wt-sidebar-prop": Omit<WtSidebarProp, keyof WtSidebarPropAttributes> & { [K in keyof WtSidebarProp & keyof WtSidebarPropAttributes]?: WtSidebarProp[K] } & { [K in keyof WtSidebarProp & keyof WtSidebarPropAttributes as `attr:${K}`]?: WtSidebarPropAttributes[K] } & { [K in keyof WtSidebarProp & keyof WtSidebarPropAttributes as `prop:${K}`]?: WtSidebarProp[K] };
         "wt-sidebar-radix": WtSidebarRadix;
-        "wt-window": WtWindow;
+        "wt-window": Omit<WtWindow, keyof WtWindowAttributes> & { [K in keyof WtWindow & keyof WtWindowAttributes]?: WtWindow[K] } & { [K in keyof WtWindow & keyof WtWindowAttributes as `attr:${K}`]?: WtWindowAttributes[K] } & { [K in keyof WtWindow & keyof WtWindowAttributes as `prop:${K}`]?: WtWindow[K] };
     }
 }
 export { LocalJSX as JSX };
@@ -840,30 +1056,30 @@ declare module "@stencil/core" {
              * with a palette of preset colors and a fill-opacity slider.
              * Emits a `change` event whenever a color or fill value is modified.
              */
-            "color-picker": LocalJSX.ColorPicker & JSXBase.HTMLAttributes<HTMLColorPickerElement>;
-            "wt-app": LocalJSX.WtApp & JSXBase.HTMLAttributes<HTMLWtAppElement>;
-            "wt-canvas": LocalJSX.WtCanvas & JSXBase.HTMLAttributes<HTMLWtCanvasElement>;
+            "color-picker": LocalJSX.IntrinsicElements["color-picker"] & JSXBase.HTMLAttributes<HTMLColorPickerElement>;
+            "wt-app": LocalJSX.IntrinsicElements["wt-app"] & JSXBase.HTMLAttributes<HTMLWtAppElement>;
+            "wt-canvas": LocalJSX.IntrinsicElements["wt-canvas"] & JSXBase.HTMLAttributes<HTMLWtCanvasElement>;
             /**
              * Navigation bar displayed above the waveform canvas.
              * Provides zoom controls (in / out / fit), a reload button,
              * a settings button, and a minimap slider showing the current
              * viewport position within the full waveform.
              */
-            "wt-canvas-nav": LocalJSX.WtCanvasNav & JSXBase.HTMLAttributes<HTMLWtCanvasNavElement>;
+            "wt-canvas-nav": LocalJSX.IntrinsicElements["wt-canvas-nav"] & JSXBase.HTMLAttributes<HTMLWtCanvasNavElement>;
             /**
              * Properties panel shown below the sidebar.
              * Displays and edits shared display properties for the currently
              * selected signal(s): color, fill, renderer mode, endianness, radix,
              * and waveform height.
              */
-            "wt-properties": LocalJSX.WtProperties & JSXBase.HTMLAttributes<HTMLWtPropertiesElement>;
+            "wt-properties": LocalJSX.IntrinsicElements["wt-properties"] & JSXBase.HTMLAttributes<HTMLWtPropertiesElement>;
             /**
              * Modal dialog for browsing and adding VCD signals to the waveform display.
              * Shows a hierarchical module tree on the left and a filterable signal list
              * on the right.  Supports multi-select (ctrl/shift), keyboard navigation,
              * and type-based filtering (wire, reg, logic, etc.).
              */
-            "wt-search": LocalJSX.WtSearch & JSXBase.HTMLAttributes<HTMLWtSearchElement>;
+            "wt-search": LocalJSX.IntrinsicElements["wt-search"] & JSXBase.HTMLAttributes<HTMLWtSearchElement>;
             /**
              * Settings panel component.
              * Provides tabbed UI for:
@@ -872,7 +1088,7 @@ declare module "@stencil/core" {
              *  - About page (rebranded to OpenTrace)
              * All licensing / activation functionality has been removed.
              */
-            "wt-settings": LocalJSX.WtSettings & JSXBase.HTMLAttributes<HTMLWtSettingsElement>;
+            "wt-settings": LocalJSX.IntrinsicElements["wt-settings"] & JSXBase.HTMLAttributes<HTMLWtSettingsElement>;
             /**
              * Main sidebar container for the signal list.
              * Manages:
@@ -882,7 +1098,7 @@ declare module "@stencil/core" {
              *  - A footer with "Add Signals" and delete buttons.
              *  - Delegates to `wt-properties` for bulk property editing.
              */
-            "wt-sidebar": LocalJSX.WtSidebar & JSXBase.HTMLAttributes<HTMLWtSidebarElement>;
+            "wt-sidebar": LocalJSX.IntrinsicElements["wt-sidebar"] & JSXBase.HTMLAttributes<HTMLWtSidebarElement>;
             /**
              * Renders a single signal row inside the sidebar.
              * For **group** signals it shows a group header with an editable alias
@@ -891,7 +1107,7 @@ declare module "@stencil/core" {
              * For all other types it renders the icon, optional bus-size badge,
              * signal name (with scope), and the current value display.
              */
-            "wt-sidebar-item": LocalJSX.WtSidebarItem & JSXBase.HTMLAttributes<HTMLWtSidebarItemElement>;
+            "wt-sidebar-item": LocalJSX.IntrinsicElements["wt-sidebar-item"] & JSXBase.HTMLAttributes<HTMLWtSidebarItemElement>;
             /**
              * Scrollable, drag-reorderable signal list container.
              * This is a lightweight generic drag-and-drop list used for
@@ -900,7 +1116,7 @@ declare module "@stencil/core" {
              * the primary signal list, but `wt-sidebar-list` is retained as a
              * reusable primitive.
              */
-            "wt-sidebar-list": LocalJSX.WtSidebarList & JSXBase.HTMLAttributes<HTMLWtSidebarListElement>;
+            "wt-sidebar-list": LocalJSX.IntrinsicElements["wt-sidebar-list"] & JSXBase.HTMLAttributes<HTMLWtSidebarListElement>;
             /**
              * Inline property editor for a single signal.
              * Displays a color picker, renderer-type toggle buttons
@@ -908,7 +1124,7 @@ declare module "@stencil/core" {
              * Emits `waveformChanged` when any property is modified so the
              * parent can update the canvas.
              */
-            "wt-sidebar-prop": LocalJSX.WtSidebarProp & JSXBase.HTMLAttributes<HTMLWtSidebarPropElement>;
+            "wt-sidebar-prop": LocalJSX.IntrinsicElements["wt-sidebar-prop"] & JSXBase.HTMLAttributes<HTMLWtSidebarPropElement>;
             /**
              * Dropdown menu for selecting the display radix of a signal value.
              * Lists all `Radix` members (bin, oct, hex, unsigned, signed, ascii,
@@ -916,8 +1132,8 @@ declare module "@stencil/core" {
              * Emits `waveformChanged` on selection and `select` to let the
              * parent know a choice was made (so it can close the dropdown).
              */
-            "wt-sidebar-radix": LocalJSX.WtSidebarRadix & JSXBase.HTMLAttributes<HTMLWtSidebarRadixElement>;
-            "wt-window": LocalJSX.WtWindow & JSXBase.HTMLAttributes<HTMLWtWindowElement>;
+            "wt-sidebar-radix": LocalJSX.IntrinsicElements["wt-sidebar-radix"] & JSXBase.HTMLAttributes<HTMLWtSidebarRadixElement>;
+            "wt-window": LocalJSX.IntrinsicElements["wt-window"] & JSXBase.HTMLAttributes<HTMLWtWindowElement>;
         }
     }
 }

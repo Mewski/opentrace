@@ -341,7 +341,7 @@ export class WtCanvas {
 
   // ------------------------------------------------------------------ Props
   /** Application configuration (keyboard, mouse, display settings). */
-  @Prop() config!: AppConfig;
+  @Prop() config?: AppConfig;
 
   /** Whether the backing waveform file has changed on disk. */
   @Prop() fileChanged: boolean = false;
