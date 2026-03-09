@@ -5,8 +5,8 @@ import {
     Radix,
     SignalValue,
     ZoomTarget
-} from '../../webview-app/src/utils/types';
-import type { Signal, SignalDisplay, Viewport } from '../../webview-app/src/utils/types';
+} from '../utils/types';
+import type { Signal, SignalDisplay, Viewport } from '../utils/types';
 
 suite('SignalType enum', () => {
     test('has all expected signal types', () => {

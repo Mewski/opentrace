@@ -24,7 +24,7 @@ suite('defaultConfig', () => {
     });
 
     test('keyboard shortcuts are all non-empty strings', () => {
-        const kb = defaultConfig.keyboard;
+        const kb = defaultConfig.keyboard as Record<string, string | number>;
         const stringKeys = Object.keys(kb).filter((k) => typeof kb[k] === 'string');
         assert.ok(stringKeys.length > 0);
         for (const key of stringKeys) {
