@@ -5,17 +5,17 @@ import { Signal } from '../../utils/types';
  * Scrollable, drag-reorderable signal list container.
  *
  * This is a lightweight generic drag-and-drop list used for
- * prototyping reorder behaviour.  The main sidebar (`wt-sidebar`)
+ * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
  * has its own built-in drag logic that supersedes this component for
- * the primary signal list, but `wt-sidebar-list` is retained as a
+ * the primary signal list, but `ot-sidebar-list` is retained as a
  * reusable primitive.
  */
 @Component({
-  tag: 'wt-sidebar-list',
-  styleUrl: 'wt-sidebar-list.css',
+  tag: 'ot-sidebar-list',
+  styleUrl: 'ot-sidebar-list.css',
   shadow: true,
 })
-export class WtSidebarList {
+export class OtSidebarList {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

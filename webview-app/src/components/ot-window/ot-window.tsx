@@ -8,15 +8,15 @@ import {
 } from '@stencil/core';
 
 // ---------------------------------------------------------------------------
-// wt-window  –  Modal / dialog window with title bar and close support
+// ot-window  –  Modal / dialog window with title bar and close support
 // ---------------------------------------------------------------------------
 
 @Component({
-  tag: 'wt-window',
-  styleUrl: 'wt-window.css',
+  tag: 'ot-window',
+  styleUrl: 'ot-window.css',
   shadow: true,
 })
-export class WtWindow {
+export class OtWindow {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

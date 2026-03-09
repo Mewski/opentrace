@@ -10,11 +10,11 @@ import { Radix, SignalDisplay } from '../../utils/types';
  * parent know a choice was made (so it can close the dropdown).
  */
 @Component({
-  tag: 'wt-sidebar-radix',
-  styleUrl: 'wt-sidebar-radix.css',
+  tag: 'ot-sidebar-radix',
+  styleUrl: 'ot-sidebar-radix.css',
   shadow: true,
 })
-export class WtSidebarRadix {
+export class OtSidebarRadix {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

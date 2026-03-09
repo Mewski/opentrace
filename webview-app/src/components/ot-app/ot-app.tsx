@@ -31,15 +31,15 @@ declare namespace hotkeys {
 }
 
 // ---------------------------------------------------------------------------
-// wt-app  –  Root application container
+// ot-app  –  Root application container
 // ---------------------------------------------------------------------------
 
 @Component({
-  tag: 'wt-app',
-  styleUrl: 'wt-app.css',
+  tag: 'ot-app',
+  styleUrl: 'ot-app.css',
   shadow: true,
 })
-export class WtApp {
+export class OtApp {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ State
@@ -262,8 +262,8 @@ export class WtApp {
     return (
       <div class="app-container">
         <aside id="aside-0">
-          <wt-sidebar
-            id="wt-sidebar-0"
+          <ot-sidebar
+            id="ot-sidebar-0"
             signals={this._signals}
             defined={this.defined}
             error={this.error}
@@ -276,19 +276,19 @@ export class WtApp {
         </aside>
         <div id="resize-handle" class="resize-handle--x" />
         <main id="main-0">
-          <wt-canvas
-            id="wt-canvas-0"
+          <ot-canvas
+            id="ot-canvas-0"
             signals={this._signalLookup}
             onSetCursor={(e: CustomEvent) => this.sidebar().updateCursor(e.detail)}
             onSettings={() => this.showSettings()}
           />
         </main>
-        <wt-search
-          id="wt-search-0"
+        <ot-search
+          id="ot-search-0"
           offsetX={this.sidebarWidth}
           onAdd={(e: CustomEvent) => this.addSignals(e.detail)}
         />
-        <wt-settings id="wt-settings-0" config={appConfig} />
+        <ot-settings id="ot-settings-0" config={appConfig} />
       </div>
     );
   }
@@ -474,18 +474,18 @@ export class WtApp {
   // ----------------------------------------------------- Child accessors
 
   private sidebar(): any {
-    return this.el.shadowRoot!.getElementById('wt-sidebar-0');
+    return this.el.shadowRoot!.getElementById('ot-sidebar-0');
   }
 
   private search(): any {
-    return this.el.shadowRoot!.getElementById('wt-search-0');
+    return this.el.shadowRoot!.getElementById('ot-search-0');
   }
 
   private canvas(): any {
-    return this.el.shadowRoot!.getElementById('wt-canvas-0');
+    return this.el.shadowRoot!.getElementById('ot-canvas-0');
   }
 
   private settings(): any {
-    return this.el.shadowRoot!.getElementById('wt-settings-0');
+    return this.el.shadowRoot!.getElementById('ot-settings-0');
   }
 }

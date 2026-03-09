@@ -146,17 +146,17 @@ ul {
   cursor: grab !important;
 }
 
-wt-sidebar-item {
+ot-sidebar-item {
   display: inline-flex;
   width: 100%;
   vertical-align: top;
 }
 
-wt-sidebar-item.prop-open .wi-item .wi-icon {
+ot-sidebar-item.prop-open .wi-item .wi-icon {
   opacity: 1;
 }
 
-.sortable-chosen wt-sidebar-item .wi-item {
+.sortable-chosen ot-sidebar-item .wi-item {
   background: var(--accent);
 }
 

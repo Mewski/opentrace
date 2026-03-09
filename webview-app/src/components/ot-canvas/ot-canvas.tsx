@@ -332,11 +332,11 @@ declare function unbindKey(combo: string): void;
 // ---------------------------------------------------------------------------
 
 @Component({
-  tag: 'wt-canvas',
-  styleUrl: 'wt-canvas.css',
+  tag: 'ot-canvas',
+  styleUrl: 'ot-canvas.css',
   shadow: false,  // Original uses createRenderRoot() { return this; }
 })
-export class WtCanvas {
+export class OtCanvas {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props
@@ -465,8 +465,8 @@ export class WtCanvas {
 
   render() {
     return (
-      <wt-canvas-nav
-        id="wt-canvas-nav-0"
+      <ot-canvas-nav
+        id="ot-canvas-nav-0"
         fileChanged={this.fileChanged}
         onChange={(e: CustomEvent) => this.updateViewport(e)}
       />
@@ -614,7 +614,7 @@ export class WtCanvas {
     this.app.renderer.render(this.app.stage);
 
     // Push viewport state to the nav bar.
-    const nav = this.el.querySelector('#wt-canvas-nav-0') as any;
+    const nav = this.el.querySelector('#ot-canvas-nav-0') as any;
     if (nav) {
       nav.setViewport?.(this.viewport.get());
     }
@@ -648,7 +648,7 @@ export class WtCanvas {
     this.cursor.move(time);
 
     // Update the nav bar marker.
-    const nav = this.el.querySelector('#wt-canvas-nav-0') as any;
+    const nav = this.el.querySelector('#ot-canvas-nav-0') as any;
     nav?.setPrimaryMarker?.((time / this.viewport.length) * 100);
 
     // Collect the value at the cursor for each waveform.

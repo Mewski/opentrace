@@ -25,11 +25,11 @@ interface VcdSignalEntry {
  * and type-based filtering (wire, reg, logic, etc.).
  */
 @Component({
-  tag: 'wt-search',
-  styleUrl: 'wt-search.css',
+  tag: 'ot-search',
+  styleUrl: 'ot-search.css',
   shadow: true,
 })
-export class WtSearch {
+export class OtSearch {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

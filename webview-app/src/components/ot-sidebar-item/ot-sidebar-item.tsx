@@ -6,17 +6,17 @@ import { SIGNAL_ICONS, getSignalIconKey } from '../../utils/icons';
  * Renders a single signal row inside the sidebar.
  *
  * For **group** signals it shows a group header with an editable alias
- * and recursively renders children as nested `wt-sidebar-item` elements.
+ * and recursively renders children as nested `ot-sidebar-item` elements.
  * For **divider** signals it renders a blank header.
  * For all other types it renders the icon, optional bus-size badge,
  * signal name (with scope), and the current value display.
  */
 @Component({
-  tag: 'wt-sidebar-item',
-  styleUrl: 'wt-sidebar-item.css',
+  tag: 'ot-sidebar-item',
+  styleUrl: 'ot-sidebar-item.css',
   shadow: false,
 })
-export class WtSidebarItem {
+export class OtSidebarItem {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props
@@ -126,7 +126,7 @@ export class WtSidebarItem {
           </div>
           <div class="wg-body">
             {sig.children.map(child => (
-              <wt-sidebar-item
+              <ot-sidebar-item
                 signal={child}
                 id={`wi-${child.id}`}
                 class="item wi-container"

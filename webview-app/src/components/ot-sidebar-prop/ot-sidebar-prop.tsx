@@ -10,11 +10,11 @@ import { RendererType, SignalDisplay } from '../../utils/types';
  * parent can update the canvas.
  */
 @Component({
-  tag: 'wt-sidebar-prop',
-  styleUrl: 'wt-sidebar-prop.css',
+  tag: 'ot-sidebar-prop',
+  styleUrl: 'ot-sidebar-prop.css',
   shadow: true,
 })
-export class WtSidebarProp {
+export class OtSidebarProp {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

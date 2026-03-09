@@ -22,11 +22,11 @@ export interface Viewport {
  * viewport position within the full waveform.
  */
 @Component({
-  tag: 'wt-canvas-nav',
-  styleUrl: 'wt-canvas-nav.css',
+  tag: 'ot-canvas-nav',
+  styleUrl: 'ot-canvas-nav.css',
   shadow: true,
 })
-export class WtCanvasNav {
+export class OtCanvasNav {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

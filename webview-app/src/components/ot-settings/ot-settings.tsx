@@ -3,7 +3,7 @@ import { AppConfig, KeyboardConfig } from '../../utils/types';
 import { APP_NAME, APP_DESCRIPTION, APP_VERSION, SettingsTab } from '../../utils/constants';
 
 /**
- * Global config object managed by the host application (wt-app).
+ * Global config object managed by the host application (ot-app).
  * Declared here so TypeScript is aware of it.
  */
 declare const appConfig: AppConfig;
@@ -19,11 +19,11 @@ declare const appConfig: AppConfig;
  * All licensing / activation functionality has been removed.
  */
 @Component({
-  tag: 'wt-settings',
-  styleUrl: 'wt-settings.css',
+  tag: 'ot-settings',
+  styleUrl: 'ot-settings.css',
   shadow: true,
 })
-export class WtSettings {
+export class OtSettings {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props
@@ -210,7 +210,7 @@ export class WtSettings {
     const cfg = this.getConfig();
 
     return (
-      <wt-window title="Settings" backgroundBlur visible={this.visible}>
+      <ot-window title="Settings" backgroundBlur visible={this.visible}>
         <div slot="content" class="tabs">
           {/* -------- Tab navigation -------- */}
           <div class="tab-nav">
@@ -291,7 +291,7 @@ export class WtSettings {
             Close
           </button>
         </div>
-      </wt-window>
+      </ot-window>
     );
   }
 }

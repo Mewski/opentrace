@@ -6,9 +6,9 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AppConfig, Signal, SignalDisplay } from "./utils/types";
-import { Viewport } from "./components/wt-canvas-nav/wt-canvas-nav";
+import { Viewport } from "./components/ot-canvas-nav/ot-canvas-nav";
 export { AppConfig, Signal, SignalDisplay } from "./utils/types";
-export { Viewport } from "./components/wt-canvas-nav/wt-canvas-nav";
+export { Viewport } from "./components/ot-canvas-nav/ot-canvas-nav";
 export namespace Components {
     /**
      * Color selection widget.
@@ -34,7 +34,7 @@ export namespace Components {
          */
         "palette": string[];
     }
-    interface WtApp {
+    interface OtApp {
         /**
           * Clear the current VCD data and all signals.
          */
@@ -68,7 +68,7 @@ export namespace Components {
          */
         "setMachine": (machine: any) => Promise<void>;
     }
-    interface WtCanvas {
+    interface OtCanvas {
         /**
           * Clear the active-signal highlight.
          */
@@ -113,7 +113,7 @@ export namespace Components {
      * a settings button, and a minimap slider showing the current
      * viewport position within the full waveform.
      */
-    interface WtCanvasNav {
+    interface OtCanvasNav {
         /**
           * Whether the backing file has changed on disk (highlights the reload button).
           * @default false
@@ -134,7 +134,7 @@ export namespace Components {
      * selected signal(s): color, fill, renderer mode, endianness, radix,
      * and waveform height.
      */
-    interface WtProperties {
+    interface OtProperties {
         /**
           * The set of currently selected signals whose properties are shown/edited.
           * @default []
@@ -147,7 +147,7 @@ export namespace Components {
      * on the right.  Supports multi-select (ctrl/shift), keyboard navigation,
      * and type-based filtering (wire, reg, logic, etc.).
      */
-    interface WtSearch {
+    interface OtSearch {
         /**
           * Hide the search dialog.
          */
@@ -178,7 +178,7 @@ export namespace Components {
      *  - About page (rebranded to OpenTrace)
      * All licensing / activation functionality has been removed.
      */
-    interface WtSettings {
+    interface OtSettings {
         /**
           * The application config object (passed by reference from the host).
           * @default null
@@ -196,13 +196,13 @@ export namespace Components {
     /**
      * Main sidebar container for the signal list.
      * Manages:
-     *  - Rendering the ordered list of signals via `wt-sidebar-item`.
+     *  - Rendering the ordered list of signals via `ot-sidebar-item`.
      *  - Multi-select with Ctrl click, adjacent navigation with arrows.
      *  - Drag-and-drop reordering of signals.
      *  - A footer with "Add Signals" and delete buttons.
-     *  - Delegates to `wt-properties` for bulk property editing.
+     *  - Delegates to `ot-properties` for bulk property editing.
      */
-    interface WtSidebar {
+    interface OtSidebar {
         /**
           * Clear all selection state.
          */
@@ -249,12 +249,12 @@ export namespace Components {
     /**
      * Renders a single signal row inside the sidebar.
      * For **group** signals it shows a group header with an editable alias
-     * and recursively renders children as nested `wt-sidebar-item` elements.
+     * and recursively renders children as nested `ot-sidebar-item` elements.
      * For **divider** signals it renders a blank header.
      * For all other types it renders the icon, optional bus-size badge,
      * signal name (with scope), and the current value display.
      */
-    interface WtSidebarItem {
+    interface OtSidebarItem {
         /**
           * Measure the rendered element and write display.y / display.height back.
          */
@@ -272,12 +272,12 @@ export namespace Components {
     /**
      * Scrollable, drag-reorderable signal list container.
      * This is a lightweight generic drag-and-drop list used for
-     * prototyping reorder behaviour.  The main sidebar (`wt-sidebar`)
+     * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
      * has its own built-in drag logic that supersedes this component for
-     * the primary signal list, but `wt-sidebar-list` is retained as a
+     * the primary signal list, but `ot-sidebar-list` is retained as a
      * reusable primitive.
      */
-    interface WtSidebarList {
+    interface OtSidebarList {
         /**
           * Signal items to display. The setter copies the reference and triggers a re-render.
           * @default []
@@ -291,7 +291,7 @@ export namespace Components {
      * Emits `waveformChanged` when any property is modified so the
      * parent can update the canvas.
      */
-    interface WtSidebarProp {
+    interface OtSidebarProp {
         /**
           * Bit-width of the signal (controls which renderer buttons are shown).
           * @default 0
@@ -310,14 +310,14 @@ export namespace Components {
      * Emits `waveformChanged` on selection and `select` to let the
      * parent know a choice was made (so it can close the dropdown).
      */
-    interface WtSidebarRadix {
+    interface OtSidebarRadix {
         /**
           * Display options (contains `.radix` and `.color`).
           * @default {} as SignalDisplay
          */
         "options": SignalDisplay;
     }
-    interface WtWindow {
+    interface OtWindow {
         /**
           * When true, applies a backdrop blur effect behind the window.
           * @default false
@@ -347,45 +347,45 @@ export interface ColorPickerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLColorPickerElement;
 }
-export interface WtAppCustomEvent<T> extends CustomEvent<T> {
+export interface OtAppCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtAppElement;
+    target: HTMLOtAppElement;
 }
-export interface WtCanvasCustomEvent<T> extends CustomEvent<T> {
+export interface OtCanvasCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtCanvasElement;
+    target: HTMLOtCanvasElement;
 }
-export interface WtCanvasNavCustomEvent<T> extends CustomEvent<T> {
+export interface OtCanvasNavCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtCanvasNavElement;
+    target: HTMLOtCanvasNavElement;
 }
-export interface WtPropertiesCustomEvent<T> extends CustomEvent<T> {
+export interface OtPropertiesCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtPropertiesElement;
+    target: HTMLOtPropertiesElement;
 }
-export interface WtSearchCustomEvent<T> extends CustomEvent<T> {
+export interface OtSearchCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtSearchElement;
+    target: HTMLOtSearchElement;
 }
-export interface WtSettingsCustomEvent<T> extends CustomEvent<T> {
+export interface OtSettingsCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtSettingsElement;
+    target: HTMLOtSettingsElement;
 }
-export interface WtSidebarCustomEvent<T> extends CustomEvent<T> {
+export interface OtSidebarCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtSidebarElement;
+    target: HTMLOtSidebarElement;
 }
-export interface WtSidebarItemCustomEvent<T> extends CustomEvent<T> {
+export interface OtSidebarItemCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtSidebarItemElement;
+    target: HTMLOtSidebarItemElement;
 }
-export interface WtSidebarPropCustomEvent<T> extends CustomEvent<T> {
+export interface OtSidebarPropCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtSidebarPropElement;
+    target: HTMLOtSidebarPropElement;
 }
-export interface WtSidebarRadixCustomEvent<T> extends CustomEvent<T> {
+export interface OtSidebarRadixCustomEvent<T> extends CustomEvent<T> {
     detail: T;
-    target: HTMLWtSidebarRadixElement;
+    target: HTMLOtSidebarRadixElement;
 }
 declare global {
     interface HTMLColorPickerElementEventMap {
@@ -411,7 +411,7 @@ declare global {
         prototype: HTMLColorPickerElement;
         new (): HTMLColorPickerElement;
     };
-    interface HTMLWtAppElementEventMap {
+    interface HTMLOtAppElementEventMap {
         "vcd-ready": void;
         "vcd-done": void;
         "log": string;
@@ -422,39 +422,39 @@ declare global {
         "settings-json": {};
         "open-website": {};
     }
-    interface HTMLWtAppElement extends Components.WtApp, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtAppElementEventMap>(type: K, listener: (this: HTMLWtAppElement, ev: WtAppCustomEvent<HTMLWtAppElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtAppElement extends Components.OtApp, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtAppElementEventMap>(type: K, listener: (this: HTMLOtAppElement, ev: OtAppCustomEvent<HTMLOtAppElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtAppElementEventMap>(type: K, listener: (this: HTMLWtAppElement, ev: WtAppCustomEvent<HTMLWtAppElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtAppElementEventMap>(type: K, listener: (this: HTMLOtAppElement, ev: OtAppCustomEvent<HTMLOtAppElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtAppElement: {
-        prototype: HTMLWtAppElement;
-        new (): HTMLWtAppElement;
+    var HTMLOtAppElement: {
+        prototype: HTMLOtAppElement;
+        new (): HTMLOtAppElement;
     };
-    interface HTMLWtCanvasElementEventMap {
+    interface HTMLOtCanvasElementEventMap {
         "setCursor": Record<string, string>;
         "settings": void;
     }
-    interface HTMLWtCanvasElement extends Components.WtCanvas, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtCanvasElementEventMap>(type: K, listener: (this: HTMLWtCanvasElement, ev: WtCanvasCustomEvent<HTMLWtCanvasElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtCanvasElement extends Components.OtCanvas, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtCanvasElementEventMap>(type: K, listener: (this: HTMLOtCanvasElement, ev: OtCanvasCustomEvent<HTMLOtCanvasElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtCanvasElementEventMap>(type: K, listener: (this: HTMLWtCanvasElement, ev: WtCanvasCustomEvent<HTMLWtCanvasElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtCanvasElementEventMap>(type: K, listener: (this: HTMLOtCanvasElement, ev: OtCanvasCustomEvent<HTMLOtCanvasElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtCanvasElement: {
-        prototype: HTMLWtCanvasElement;
-        new (): HTMLWtCanvasElement;
+    var HTMLOtCanvasElement: {
+        prototype: HTMLOtCanvasElement;
+        new (): HTMLOtCanvasElement;
     };
-    interface HTMLWtCanvasNavElementEventMap {
+    interface HTMLOtCanvasNavElementEventMap {
         "change": { cmd: string; value?: number };
         "file-reload": {};
         "settings": {};
@@ -465,21 +465,21 @@ declare global {
      * a settings button, and a minimap slider showing the current
      * viewport position within the full waveform.
      */
-    interface HTMLWtCanvasNavElement extends Components.WtCanvasNav, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtCanvasNavElementEventMap>(type: K, listener: (this: HTMLWtCanvasNavElement, ev: WtCanvasNavCustomEvent<HTMLWtCanvasNavElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtCanvasNavElement extends Components.OtCanvasNav, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtCanvasNavElementEventMap>(type: K, listener: (this: HTMLOtCanvasNavElement, ev: OtCanvasNavCustomEvent<HTMLOtCanvasNavElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtCanvasNavElementEventMap>(type: K, listener: (this: HTMLWtCanvasNavElement, ev: WtCanvasNavCustomEvent<HTMLWtCanvasNavElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtCanvasNavElementEventMap>(type: K, listener: (this: HTMLOtCanvasNavElement, ev: OtCanvasNavCustomEvent<HTMLOtCanvasNavElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtCanvasNavElement: {
-        prototype: HTMLWtCanvasNavElement;
-        new (): HTMLWtCanvasNavElement;
+    var HTMLOtCanvasNavElement: {
+        prototype: HTMLOtCanvasNavElement;
+        new (): HTMLOtCanvasNavElement;
     };
-    interface HTMLWtPropertiesElementEventMap {
+    interface HTMLOtPropertiesElementEventMap {
         "redraw": { resize: boolean };
     }
     /**
@@ -488,21 +488,21 @@ declare global {
      * selected signal(s): color, fill, renderer mode, endianness, radix,
      * and waveform height.
      */
-    interface HTMLWtPropertiesElement extends Components.WtProperties, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtPropertiesElementEventMap>(type: K, listener: (this: HTMLWtPropertiesElement, ev: WtPropertiesCustomEvent<HTMLWtPropertiesElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtPropertiesElement extends Components.OtProperties, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtPropertiesElementEventMap>(type: K, listener: (this: HTMLOtPropertiesElement, ev: OtPropertiesCustomEvent<HTMLOtPropertiesElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtPropertiesElementEventMap>(type: K, listener: (this: HTMLWtPropertiesElement, ev: WtPropertiesCustomEvent<HTMLWtPropertiesElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtPropertiesElementEventMap>(type: K, listener: (this: HTMLOtPropertiesElement, ev: OtPropertiesCustomEvent<HTMLOtPropertiesElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtPropertiesElement: {
-        prototype: HTMLWtPropertiesElement;
-        new (): HTMLWtPropertiesElement;
+    var HTMLOtPropertiesElement: {
+        prototype: HTMLOtPropertiesElement;
+        new (): HTMLOtPropertiesElement;
     };
-    interface HTMLWtSearchElementEventMap {
+    interface HTMLOtSearchElementEventMap {
         "add": Signal[];
     }
     /**
@@ -511,21 +511,21 @@ declare global {
      * on the right.  Supports multi-select (ctrl/shift), keyboard navigation,
      * and type-based filtering (wire, reg, logic, etc.).
      */
-    interface HTMLWtSearchElement extends Components.WtSearch, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtSearchElementEventMap>(type: K, listener: (this: HTMLWtSearchElement, ev: WtSearchCustomEvent<HTMLWtSearchElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtSearchElement extends Components.OtSearch, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtSearchElementEventMap>(type: K, listener: (this: HTMLOtSearchElement, ev: OtSearchCustomEvent<HTMLOtSearchElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtSearchElementEventMap>(type: K, listener: (this: HTMLWtSearchElement, ev: WtSearchCustomEvent<HTMLWtSearchElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtSearchElementEventMap>(type: K, listener: (this: HTMLOtSearchElement, ev: OtSearchCustomEvent<HTMLOtSearchElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtSearchElement: {
-        prototype: HTMLWtSearchElement;
-        new (): HTMLWtSearchElement;
+    var HTMLOtSearchElement: {
+        prototype: HTMLOtSearchElement;
+        new (): HTMLOtSearchElement;
     };
-    interface HTMLWtSettingsElementEventMap {
+    interface HTMLOtSettingsElementEventMap {
         "config-save": string;
         "settings-json": {};
         "config-reload": {};
@@ -539,21 +539,21 @@ declare global {
      *  - About page (rebranded to OpenTrace)
      * All licensing / activation functionality has been removed.
      */
-    interface HTMLWtSettingsElement extends Components.WtSettings, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtSettingsElementEventMap>(type: K, listener: (this: HTMLWtSettingsElement, ev: WtSettingsCustomEvent<HTMLWtSettingsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtSettingsElement extends Components.OtSettings, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtSettingsElementEventMap>(type: K, listener: (this: HTMLOtSettingsElement, ev: OtSettingsCustomEvent<HTMLOtSettingsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtSettingsElementEventMap>(type: K, listener: (this: HTMLWtSettingsElement, ev: WtSettingsCustomEvent<HTMLWtSettingsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtSettingsElementEventMap>(type: K, listener: (this: HTMLOtSettingsElement, ev: OtSettingsCustomEvent<HTMLOtSettingsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtSettingsElement: {
-        prototype: HTMLWtSettingsElement;
-        new (): HTMLWtSettingsElement;
+    var HTMLOtSettingsElement: {
+        prototype: HTMLOtSettingsElement;
+        new (): HTMLOtSettingsElement;
     };
-    interface HTMLWtSidebarElementEventMap {
+    interface HTMLOtSidebarElementEventMap {
         "add": void;
         "delete": void;
         "waveformChanged": void;
@@ -563,66 +563,66 @@ declare global {
     /**
      * Main sidebar container for the signal list.
      * Manages:
-     *  - Rendering the ordered list of signals via `wt-sidebar-item`.
+     *  - Rendering the ordered list of signals via `ot-sidebar-item`.
      *  - Multi-select with Ctrl click, adjacent navigation with arrows.
      *  - Drag-and-drop reordering of signals.
      *  - A footer with "Add Signals" and delete buttons.
-     *  - Delegates to `wt-properties` for bulk property editing.
+     *  - Delegates to `ot-properties` for bulk property editing.
      */
-    interface HTMLWtSidebarElement extends Components.WtSidebar, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtSidebarElementEventMap>(type: K, listener: (this: HTMLWtSidebarElement, ev: WtSidebarCustomEvent<HTMLWtSidebarElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtSidebarElement extends Components.OtSidebar, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtSidebarElementEventMap>(type: K, listener: (this: HTMLOtSidebarElement, ev: OtSidebarCustomEvent<HTMLOtSidebarElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtSidebarElementEventMap>(type: K, listener: (this: HTMLWtSidebarElement, ev: WtSidebarCustomEvent<HTMLWtSidebarElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtSidebarElementEventMap>(type: K, listener: (this: HTMLOtSidebarElement, ev: OtSidebarCustomEvent<HTMLOtSidebarElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtSidebarElement: {
-        prototype: HTMLWtSidebarElement;
-        new (): HTMLWtSidebarElement;
+    var HTMLOtSidebarElement: {
+        prototype: HTMLOtSidebarElement;
+        new (): HTMLOtSidebarElement;
     };
-    interface HTMLWtSidebarItemElementEventMap {
+    interface HTMLOtSidebarItemElementEventMap {
         "resizeSignals": void;
     }
     /**
      * Renders a single signal row inside the sidebar.
      * For **group** signals it shows a group header with an editable alias
-     * and recursively renders children as nested `wt-sidebar-item` elements.
+     * and recursively renders children as nested `ot-sidebar-item` elements.
      * For **divider** signals it renders a blank header.
      * For all other types it renders the icon, optional bus-size badge,
      * signal name (with scope), and the current value display.
      */
-    interface HTMLWtSidebarItemElement extends Components.WtSidebarItem, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtSidebarItemElementEventMap>(type: K, listener: (this: HTMLWtSidebarItemElement, ev: WtSidebarItemCustomEvent<HTMLWtSidebarItemElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtSidebarItemElement extends Components.OtSidebarItem, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtSidebarItemElementEventMap>(type: K, listener: (this: HTMLOtSidebarItemElement, ev: OtSidebarItemCustomEvent<HTMLOtSidebarItemElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtSidebarItemElementEventMap>(type: K, listener: (this: HTMLWtSidebarItemElement, ev: WtSidebarItemCustomEvent<HTMLWtSidebarItemElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtSidebarItemElementEventMap>(type: K, listener: (this: HTMLOtSidebarItemElement, ev: OtSidebarItemCustomEvent<HTMLOtSidebarItemElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtSidebarItemElement: {
-        prototype: HTMLWtSidebarItemElement;
-        new (): HTMLWtSidebarItemElement;
+    var HTMLOtSidebarItemElement: {
+        prototype: HTMLOtSidebarItemElement;
+        new (): HTMLOtSidebarItemElement;
     };
     /**
      * Scrollable, drag-reorderable signal list container.
      * This is a lightweight generic drag-and-drop list used for
-     * prototyping reorder behaviour.  The main sidebar (`wt-sidebar`)
+     * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
      * has its own built-in drag logic that supersedes this component for
-     * the primary signal list, but `wt-sidebar-list` is retained as a
+     * the primary signal list, but `ot-sidebar-list` is retained as a
      * reusable primitive.
      */
-    interface HTMLWtSidebarListElement extends Components.WtSidebarList, HTMLStencilElement {
+    interface HTMLOtSidebarListElement extends Components.OtSidebarList, HTMLStencilElement {
     }
-    var HTMLWtSidebarListElement: {
-        prototype: HTMLWtSidebarListElement;
-        new (): HTMLWtSidebarListElement;
+    var HTMLOtSidebarListElement: {
+        prototype: HTMLOtSidebarListElement;
+        new (): HTMLOtSidebarListElement;
     };
-    interface HTMLWtSidebarPropElementEventMap {
+    interface HTMLOtSidebarPropElementEventMap {
         "waveformChanged": SignalDisplay;
         "resizeSignals": void;
     }
@@ -633,21 +633,21 @@ declare global {
      * Emits `waveformChanged` when any property is modified so the
      * parent can update the canvas.
      */
-    interface HTMLWtSidebarPropElement extends Components.WtSidebarProp, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtSidebarPropElementEventMap>(type: K, listener: (this: HTMLWtSidebarPropElement, ev: WtSidebarPropCustomEvent<HTMLWtSidebarPropElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtSidebarPropElement extends Components.OtSidebarProp, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtSidebarPropElementEventMap>(type: K, listener: (this: HTMLOtSidebarPropElement, ev: OtSidebarPropCustomEvent<HTMLOtSidebarPropElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtSidebarPropElementEventMap>(type: K, listener: (this: HTMLWtSidebarPropElement, ev: WtSidebarPropCustomEvent<HTMLWtSidebarPropElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtSidebarPropElementEventMap>(type: K, listener: (this: HTMLOtSidebarPropElement, ev: OtSidebarPropCustomEvent<HTMLOtSidebarPropElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtSidebarPropElement: {
-        prototype: HTMLWtSidebarPropElement;
-        new (): HTMLWtSidebarPropElement;
+    var HTMLOtSidebarPropElement: {
+        prototype: HTMLOtSidebarPropElement;
+        new (): HTMLOtSidebarPropElement;
     };
-    interface HTMLWtSidebarRadixElementEventMap {
+    interface HTMLOtSidebarRadixElementEventMap {
         "waveformChanged": SignalDisplay;
         "select": void;
         "resizeSignals": void;
@@ -659,40 +659,40 @@ declare global {
      * Emits `waveformChanged` on selection and `select` to let the
      * parent know a choice was made (so it can close the dropdown).
      */
-    interface HTMLWtSidebarRadixElement extends Components.WtSidebarRadix, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLWtSidebarRadixElementEventMap>(type: K, listener: (this: HTMLWtSidebarRadixElement, ev: WtSidebarRadixCustomEvent<HTMLWtSidebarRadixElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+    interface HTMLOtSidebarRadixElement extends Components.OtSidebarRadix, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLOtSidebarRadixElementEventMap>(type: K, listener: (this: HTMLOtSidebarRadixElement, ev: OtSidebarRadixCustomEvent<HTMLOtSidebarRadixElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
         addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLWtSidebarRadixElementEventMap>(type: K, listener: (this: HTMLWtSidebarRadixElement, ev: WtSidebarRadixCustomEvent<HTMLWtSidebarRadixElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLOtSidebarRadixElementEventMap>(type: K, listener: (this: HTMLOtSidebarRadixElement, ev: OtSidebarRadixCustomEvent<HTMLOtSidebarRadixElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
         removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
-    var HTMLWtSidebarRadixElement: {
-        prototype: HTMLWtSidebarRadixElement;
-        new (): HTMLWtSidebarRadixElement;
+    var HTMLOtSidebarRadixElement: {
+        prototype: HTMLOtSidebarRadixElement;
+        new (): HTMLOtSidebarRadixElement;
     };
-    interface HTMLWtWindowElement extends Components.WtWindow, HTMLStencilElement {
+    interface HTMLOtWindowElement extends Components.OtWindow, HTMLStencilElement {
     }
-    var HTMLWtWindowElement: {
-        prototype: HTMLWtWindowElement;
-        new (): HTMLWtWindowElement;
+    var HTMLOtWindowElement: {
+        prototype: HTMLOtWindowElement;
+        new (): HTMLOtWindowElement;
     };
     interface HTMLElementTagNameMap {
         "color-picker": HTMLColorPickerElement;
-        "wt-app": HTMLWtAppElement;
-        "wt-canvas": HTMLWtCanvasElement;
-        "wt-canvas-nav": HTMLWtCanvasNavElement;
-        "wt-properties": HTMLWtPropertiesElement;
-        "wt-search": HTMLWtSearchElement;
-        "wt-settings": HTMLWtSettingsElement;
-        "wt-sidebar": HTMLWtSidebarElement;
-        "wt-sidebar-item": HTMLWtSidebarItemElement;
-        "wt-sidebar-list": HTMLWtSidebarListElement;
-        "wt-sidebar-prop": HTMLWtSidebarPropElement;
-        "wt-sidebar-radix": HTMLWtSidebarRadixElement;
-        "wt-window": HTMLWtWindowElement;
+        "ot-app": HTMLOtAppElement;
+        "ot-canvas": HTMLOtCanvasElement;
+        "ot-canvas-nav": HTMLOtCanvasNavElement;
+        "ot-properties": HTMLOtPropertiesElement;
+        "ot-search": HTMLOtSearchElement;
+        "ot-settings": HTMLOtSettingsElement;
+        "ot-sidebar": HTMLOtSidebarElement;
+        "ot-sidebar-item": HTMLOtSidebarItemElement;
+        "ot-sidebar-list": HTMLOtSidebarListElement;
+        "ot-sidebar-prop": HTMLOtSidebarPropElement;
+        "ot-sidebar-radix": HTMLOtSidebarRadixElement;
+        "ot-window": HTMLOtWindowElement;
     }
 }
 declare namespace LocalJSX {
@@ -723,18 +723,18 @@ declare namespace LocalJSX {
          */
         "palette"?: string[];
     }
-    interface WtApp {
-        "onConfig-reload"?: (event: WtAppCustomEvent<{}>) => void;
-        "onConfig-reset"?: (event: WtAppCustomEvent<{}>) => void;
-        "onConfig-save"?: (event: WtAppCustomEvent<string>) => void;
-        "onFile-reload"?: (event: WtAppCustomEvent<{}>) => void;
-        "onLog"?: (event: WtAppCustomEvent<string>) => void;
-        "onOpen-website"?: (event: WtAppCustomEvent<{}>) => void;
-        "onSettings-json"?: (event: WtAppCustomEvent<{}>) => void;
-        "onVcd-done"?: (event: WtAppCustomEvent<void>) => void;
-        "onVcd-ready"?: (event: WtAppCustomEvent<void>) => void;
+    interface OtApp {
+        "onConfig-reload"?: (event: OtAppCustomEvent<{}>) => void;
+        "onConfig-reset"?: (event: OtAppCustomEvent<{}>) => void;
+        "onConfig-save"?: (event: OtAppCustomEvent<string>) => void;
+        "onFile-reload"?: (event: OtAppCustomEvent<{}>) => void;
+        "onLog"?: (event: OtAppCustomEvent<string>) => void;
+        "onOpen-website"?: (event: OtAppCustomEvent<{}>) => void;
+        "onSettings-json"?: (event: OtAppCustomEvent<{}>) => void;
+        "onVcd-done"?: (event: OtAppCustomEvent<void>) => void;
+        "onVcd-ready"?: (event: OtAppCustomEvent<void>) => void;
     }
-    interface WtCanvas {
+    interface OtCanvas {
         /**
           * Application configuration (keyboard, mouse, display settings).
          */
@@ -747,11 +747,11 @@ declare namespace LocalJSX {
         /**
           * Emitted when the cursor moves, carrying the value at the cursor for each signal.
          */
-        "onSetCursor"?: (event: WtCanvasCustomEvent<Record<string, string>>) => void;
+        "onSetCursor"?: (event: OtCanvasCustomEvent<Record<string, string>>) => void;
         /**
           * Emitted when the user requests the settings panel.
          */
-        "onSettings"?: (event: WtCanvasCustomEvent<void>) => void;
+        "onSettings"?: (event: OtCanvasCustomEvent<void>) => void;
         /**
           * Map of signal id -> signal metadata, keyed by numeric id.
          */
@@ -763,7 +763,7 @@ declare namespace LocalJSX {
      * a settings button, and a minimap slider showing the current
      * viewport position within the full waveform.
      */
-    interface WtCanvasNav {
+    interface OtCanvasNav {
         /**
           * Whether the backing file has changed on disk (highlights the reload button).
           * @default false
@@ -772,15 +772,15 @@ declare namespace LocalJSX {
         /**
           * Emitted when the user requests a viewport change (zoom, goto).
          */
-        "onChange"?: (event: WtCanvasNavCustomEvent<{ cmd: string; value?: number }>) => void;
+        "onChange"?: (event: OtCanvasNavCustomEvent<{ cmd: string; value?: number }>) => void;
         /**
           * Emitted when the user clicks the reload button.
          */
-        "onFile-reload"?: (event: WtCanvasNavCustomEvent<{}>) => void;
+        "onFile-reload"?: (event: OtCanvasNavCustomEvent<{}>) => void;
         /**
           * Emitted when the user clicks the settings button.
          */
-        "onSettings"?: (event: WtCanvasNavCustomEvent<{}>) => void;
+        "onSettings"?: (event: OtCanvasNavCustomEvent<{}>) => void;
     }
     /**
      * Properties panel shown below the sidebar.
@@ -788,11 +788,11 @@ declare namespace LocalJSX {
      * selected signal(s): color, fill, renderer mode, endianness, radix,
      * and waveform height.
      */
-    interface WtProperties {
+    interface OtProperties {
         /**
           * Emitted when a property changes, requesting the canvas to redraw.
          */
-        "onRedraw"?: (event: WtPropertiesCustomEvent<{ resize: boolean }>) => void;
+        "onRedraw"?: (event: OtPropertiesCustomEvent<{ resize: boolean }>) => void;
         /**
           * The set of currently selected signals whose properties are shown/edited.
           * @default []
@@ -805,7 +805,7 @@ declare namespace LocalJSX {
      * on the right.  Supports multi-select (ctrl/shift), keyboard navigation,
      * and type-based filtering (wire, reg, logic, etc.).
      */
-    interface WtSearch {
+    interface OtSearch {
         /**
           * Horizontal offset for positioning.
           * @default 0
@@ -814,7 +814,7 @@ declare namespace LocalJSX {
         /**
           * Emitted when the user adds selected signals. Detail is the array of Signal objects.
          */
-        "onAdd"?: (event: WtSearchCustomEvent<Signal[]>) => void;
+        "onAdd"?: (event: OtSearchCustomEvent<Signal[]>) => void;
     }
     /**
      * Settings panel component.
@@ -824,7 +824,7 @@ declare namespace LocalJSX {
      *  - About page (rebranded to OpenTrace)
      * All licensing / activation functionality has been removed.
      */
-    interface WtSettings {
+    interface OtSettings {
         /**
           * The application config object (passed by reference from the host).
           * @default null
@@ -833,30 +833,30 @@ declare namespace LocalJSX {
         /**
           * Emitted to request the host to reload config from disk.
          */
-        "onConfig-reload"?: (event: WtSettingsCustomEvent<{}>) => void;
+        "onConfig-reload"?: (event: OtSettingsCustomEvent<{}>) => void;
         /**
           * Emitted to request the host to reset config to defaults.
          */
-        "onConfig-reset"?: (event: WtSettingsCustomEvent<{}>) => void;
+        "onConfig-reset"?: (event: OtSettingsCustomEvent<{}>) => void;
         /**
           * Emitted when the user clicks Apply to persist shortcut changes.
          */
-        "onConfig-save"?: (event: WtSettingsCustomEvent<string>) => void;
+        "onConfig-save"?: (event: OtSettingsCustomEvent<string>) => void;
         /**
           * Emitted to request the host to open the JSON settings file.
          */
-        "onSettings-json"?: (event: WtSettingsCustomEvent<{}>) => void;
+        "onSettings-json"?: (event: OtSettingsCustomEvent<{}>) => void;
     }
     /**
      * Main sidebar container for the signal list.
      * Manages:
-     *  - Rendering the ordered list of signals via `wt-sidebar-item`.
+     *  - Rendering the ordered list of signals via `ot-sidebar-item`.
      *  - Multi-select with Ctrl click, adjacent navigation with arrows.
      *  - Drag-and-drop reordering of signals.
      *  - A footer with "Add Signals" and delete buttons.
-     *  - Delegates to `wt-properties` for bulk property editing.
+     *  - Delegates to `ot-properties` for bulk property editing.
      */
-    interface WtSidebar {
+    interface OtSidebar {
         /**
           * Whether the waveform definition file has been fully parsed.
           * @default false
@@ -870,23 +870,23 @@ declare namespace LocalJSX {
         /**
           * Emitted when the user clicks "Add Signals".
          */
-        "onAdd"?: (event: WtSidebarCustomEvent<void>) => void;
+        "onAdd"?: (event: OtSidebarCustomEvent<void>) => void;
         /**
           * Emitted when the user clicks the delete button.
          */
-        "onDelete"?: (event: WtSidebarCustomEvent<void>) => void;
+        "onDelete"?: (event: OtSidebarCustomEvent<void>) => void;
         /**
           * Emitted when the sidebar layout changes and the canvas needs a redraw.
          */
-        "onRedraw"?: (event: WtSidebarCustomEvent<{ resize?: boolean }>) => void;
+        "onRedraw"?: (event: OtSidebarCustomEvent<{ resize?: boolean }>) => void;
         /**
           * Emitted to tell the canvas which signal to highlight.
          */
-        "onSetActiveSignal"?: (event: WtSidebarCustomEvent<number>) => void;
+        "onSetActiveSignal"?: (event: OtSidebarCustomEvent<number>) => void;
         /**
           * Emitted when signals are reordered, properties change, etc.
          */
-        "onWaveformChanged"?: (event: WtSidebarCustomEvent<void>) => void;
+        "onWaveformChanged"?: (event: OtSidebarCustomEvent<void>) => void;
         /**
           * @default []
          */
@@ -895,16 +895,16 @@ declare namespace LocalJSX {
     /**
      * Renders a single signal row inside the sidebar.
      * For **group** signals it shows a group header with an editable alias
-     * and recursively renders children as nested `wt-sidebar-item` elements.
+     * and recursively renders children as nested `ot-sidebar-item` elements.
      * For **divider** signals it renders a blank header.
      * For all other types it renders the icon, optional bus-size badge,
      * signal name (with scope), and the current value display.
      */
-    interface WtSidebarItem {
+    interface OtSidebarItem {
         /**
           * Bubbles up to request a full signal-height recalculation.
          */
-        "onResizeSignals"?: (event: WtSidebarItemCustomEvent<void>) => void;
+        "onResizeSignals"?: (event: OtSidebarItemCustomEvent<void>) => void;
         /**
           * The signal data object to render.
          */
@@ -918,12 +918,12 @@ declare namespace LocalJSX {
     /**
      * Scrollable, drag-reorderable signal list container.
      * This is a lightweight generic drag-and-drop list used for
-     * prototyping reorder behaviour.  The main sidebar (`wt-sidebar`)
+     * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
      * has its own built-in drag logic that supersedes this component for
-     * the primary signal list, but `wt-sidebar-list` is retained as a
+     * the primary signal list, but `ot-sidebar-list` is retained as a
      * reusable primitive.
      */
-    interface WtSidebarList {
+    interface OtSidebarList {
         /**
           * Signal items to display. The setter copies the reference and triggers a re-render.
           * @default []
@@ -937,7 +937,7 @@ declare namespace LocalJSX {
      * Emits `waveformChanged` when any property is modified so the
      * parent can update the canvas.
      */
-    interface WtSidebarProp {
+    interface OtSidebarProp {
         /**
           * Bit-width of the signal (controls which renderer buttons are shown).
           * @default 0
@@ -946,11 +946,11 @@ declare namespace LocalJSX {
         /**
           * Requests a full signal-height recalculation.
          */
-        "onResizeSignals"?: (event: WtSidebarPropCustomEvent<void>) => void;
+        "onResizeSignals"?: (event: OtSidebarPropCustomEvent<void>) => void;
         /**
           * Emitted whenever a display property is changed.
          */
-        "onWaveformChanged"?: (event: WtSidebarPropCustomEvent<SignalDisplay>) => void;
+        "onWaveformChanged"?: (event: OtSidebarPropCustomEvent<SignalDisplay>) => void;
         /**
           * Display options for the signal being edited.
           * @default {} as SignalDisplay
@@ -964,26 +964,26 @@ declare namespace LocalJSX {
      * Emits `waveformChanged` on selection and `select` to let the
      * parent know a choice was made (so it can close the dropdown).
      */
-    interface WtSidebarRadix {
+    interface OtSidebarRadix {
         /**
           * Requests a full signal-height recalculation.
          */
-        "onResizeSignals"?: (event: WtSidebarRadixCustomEvent<void>) => void;
+        "onResizeSignals"?: (event: OtSidebarRadixCustomEvent<void>) => void;
         /**
           * Emitted after a radix is selected (used by parent to close the menu).
          */
-        "onSelect"?: (event: WtSidebarRadixCustomEvent<void>) => void;
+        "onSelect"?: (event: OtSidebarRadixCustomEvent<void>) => void;
         /**
           * Emitted when the radix changes.
          */
-        "onWaveformChanged"?: (event: WtSidebarRadixCustomEvent<SignalDisplay>) => void;
+        "onWaveformChanged"?: (event: OtSidebarRadixCustomEvent<SignalDisplay>) => void;
         /**
           * Display options (contains `.radix` and `.color`).
           * @default {} as SignalDisplay
          */
         "options"?: SignalDisplay;
     }
-    interface WtWindow {
+    interface OtWindow {
         /**
           * When true, applies a backdrop blur effect behind the window.
           * @default false
@@ -1005,26 +1005,26 @@ declare namespace LocalJSX {
         "color": string;
         "fill": number;
     }
-    interface WtCanvasAttributes {
+    interface OtCanvasAttributes {
         "fileChanged": boolean;
     }
-    interface WtCanvasNavAttributes {
+    interface OtCanvasNavAttributes {
         "fileChanged": boolean;
     }
-    interface WtSearchAttributes {
+    interface OtSearchAttributes {
         "offsetX": number;
     }
-    interface WtSidebarAttributes {
+    interface OtSidebarAttributes {
         "defined": boolean;
         "error": boolean;
     }
-    interface WtSidebarItemAttributes {
+    interface OtSidebarItemAttributes {
         "value": string;
     }
-    interface WtSidebarPropAttributes {
+    interface OtSidebarPropAttributes {
         "busSize": number;
     }
-    interface WtWindowAttributes {
+    interface OtWindowAttributes {
         "windowTitle": string;
         "backgroundBlur": boolean;
         "visible": boolean;
@@ -1032,18 +1032,18 @@ declare namespace LocalJSX {
 
     interface IntrinsicElements {
         "color-picker": Omit<ColorPicker, keyof ColorPickerAttributes> & { [K in keyof ColorPicker & keyof ColorPickerAttributes]?: ColorPicker[K] } & { [K in keyof ColorPicker & keyof ColorPickerAttributes as `attr:${K}`]?: ColorPickerAttributes[K] } & { [K in keyof ColorPicker & keyof ColorPickerAttributes as `prop:${K}`]?: ColorPicker[K] };
-        "wt-app": WtApp;
-        "wt-canvas": Omit<WtCanvas, keyof WtCanvasAttributes> & { [K in keyof WtCanvas & keyof WtCanvasAttributes]?: WtCanvas[K] } & { [K in keyof WtCanvas & keyof WtCanvasAttributes as `attr:${K}`]?: WtCanvasAttributes[K] } & { [K in keyof WtCanvas & keyof WtCanvasAttributes as `prop:${K}`]?: WtCanvas[K] };
-        "wt-canvas-nav": Omit<WtCanvasNav, keyof WtCanvasNavAttributes> & { [K in keyof WtCanvasNav & keyof WtCanvasNavAttributes]?: WtCanvasNav[K] } & { [K in keyof WtCanvasNav & keyof WtCanvasNavAttributes as `attr:${K}`]?: WtCanvasNavAttributes[K] } & { [K in keyof WtCanvasNav & keyof WtCanvasNavAttributes as `prop:${K}`]?: WtCanvasNav[K] };
-        "wt-properties": WtProperties;
-        "wt-search": Omit<WtSearch, keyof WtSearchAttributes> & { [K in keyof WtSearch & keyof WtSearchAttributes]?: WtSearch[K] } & { [K in keyof WtSearch & keyof WtSearchAttributes as `attr:${K}`]?: WtSearchAttributes[K] } & { [K in keyof WtSearch & keyof WtSearchAttributes as `prop:${K}`]?: WtSearch[K] };
-        "wt-settings": WtSettings;
-        "wt-sidebar": Omit<WtSidebar, keyof WtSidebarAttributes> & { [K in keyof WtSidebar & keyof WtSidebarAttributes]?: WtSidebar[K] } & { [K in keyof WtSidebar & keyof WtSidebarAttributes as `attr:${K}`]?: WtSidebarAttributes[K] } & { [K in keyof WtSidebar & keyof WtSidebarAttributes as `prop:${K}`]?: WtSidebar[K] };
-        "wt-sidebar-item": Omit<WtSidebarItem, keyof WtSidebarItemAttributes> & { [K in keyof WtSidebarItem & keyof WtSidebarItemAttributes]?: WtSidebarItem[K] } & { [K in keyof WtSidebarItem & keyof WtSidebarItemAttributes as `attr:${K}`]?: WtSidebarItemAttributes[K] } & { [K in keyof WtSidebarItem & keyof WtSidebarItemAttributes as `prop:${K}`]?: WtSidebarItem[K] };
-        "wt-sidebar-list": WtSidebarList;
-        "wt-sidebar-prop": Omit<WtSidebarProp, keyof WtSidebarPropAttributes> & { [K in keyof WtSidebarProp & keyof WtSidebarPropAttributes]?: WtSidebarProp[K] } & { [K in keyof WtSidebarProp & keyof WtSidebarPropAttributes as `attr:${K}`]?: WtSidebarPropAttributes[K] } & { [K in keyof WtSidebarProp & keyof WtSidebarPropAttributes as `prop:${K}`]?: WtSidebarProp[K] };
-        "wt-sidebar-radix": WtSidebarRadix;
-        "wt-window": Omit<WtWindow, keyof WtWindowAttributes> & { [K in keyof WtWindow & keyof WtWindowAttributes]?: WtWindow[K] } & { [K in keyof WtWindow & keyof WtWindowAttributes as `attr:${K}`]?: WtWindowAttributes[K] } & { [K in keyof WtWindow & keyof WtWindowAttributes as `prop:${K}`]?: WtWindow[K] };
+        "ot-app": OtApp;
+        "ot-canvas": Omit<OtCanvas, keyof OtCanvasAttributes> & { [K in keyof OtCanvas & keyof OtCanvasAttributes]?: OtCanvas[K] } & { [K in keyof OtCanvas & keyof OtCanvasAttributes as `attr:${K}`]?: OtCanvasAttributes[K] } & { [K in keyof OtCanvas & keyof OtCanvasAttributes as `prop:${K}`]?: OtCanvas[K] };
+        "ot-canvas-nav": Omit<OtCanvasNav, keyof OtCanvasNavAttributes> & { [K in keyof OtCanvasNav & keyof OtCanvasNavAttributes]?: OtCanvasNav[K] } & { [K in keyof OtCanvasNav & keyof OtCanvasNavAttributes as `attr:${K}`]?: OtCanvasNavAttributes[K] } & { [K in keyof OtCanvasNav & keyof OtCanvasNavAttributes as `prop:${K}`]?: OtCanvasNav[K] };
+        "ot-properties": OtProperties;
+        "ot-search": Omit<OtSearch, keyof OtSearchAttributes> & { [K in keyof OtSearch & keyof OtSearchAttributes]?: OtSearch[K] } & { [K in keyof OtSearch & keyof OtSearchAttributes as `attr:${K}`]?: OtSearchAttributes[K] } & { [K in keyof OtSearch & keyof OtSearchAttributes as `prop:${K}`]?: OtSearch[K] };
+        "ot-settings": OtSettings;
+        "ot-sidebar": Omit<OtSidebar, keyof OtSidebarAttributes> & { [K in keyof OtSidebar & keyof OtSidebarAttributes]?: OtSidebar[K] } & { [K in keyof OtSidebar & keyof OtSidebarAttributes as `attr:${K}`]?: OtSidebarAttributes[K] } & { [K in keyof OtSidebar & keyof OtSidebarAttributes as `prop:${K}`]?: OtSidebar[K] };
+        "ot-sidebar-item": Omit<OtSidebarItem, keyof OtSidebarItemAttributes> & { [K in keyof OtSidebarItem & keyof OtSidebarItemAttributes]?: OtSidebarItem[K] } & { [K in keyof OtSidebarItem & keyof OtSidebarItemAttributes as `attr:${K}`]?: OtSidebarItemAttributes[K] } & { [K in keyof OtSidebarItem & keyof OtSidebarItemAttributes as `prop:${K}`]?: OtSidebarItem[K] };
+        "ot-sidebar-list": OtSidebarList;
+        "ot-sidebar-prop": Omit<OtSidebarProp, keyof OtSidebarPropAttributes> & { [K in keyof OtSidebarProp & keyof OtSidebarPropAttributes]?: OtSidebarProp[K] } & { [K in keyof OtSidebarProp & keyof OtSidebarPropAttributes as `attr:${K}`]?: OtSidebarPropAttributes[K] } & { [K in keyof OtSidebarProp & keyof OtSidebarPropAttributes as `prop:${K}`]?: OtSidebarProp[K] };
+        "ot-sidebar-radix": OtSidebarRadix;
+        "ot-window": Omit<OtWindow, keyof OtWindowAttributes> & { [K in keyof OtWindow & keyof OtWindowAttributes]?: OtWindow[K] } & { [K in keyof OtWindow & keyof OtWindowAttributes as `attr:${K}`]?: OtWindowAttributes[K] } & { [K in keyof OtWindow & keyof OtWindowAttributes as `prop:${K}`]?: OtWindow[K] };
     }
 }
 export { LocalJSX as JSX };
@@ -1057,29 +1057,29 @@ declare module "@stencil/core" {
              * Emits a `change` event whenever a color or fill value is modified.
              */
             "color-picker": LocalJSX.IntrinsicElements["color-picker"] & JSXBase.HTMLAttributes<HTMLColorPickerElement>;
-            "wt-app": LocalJSX.IntrinsicElements["wt-app"] & JSXBase.HTMLAttributes<HTMLWtAppElement>;
-            "wt-canvas": LocalJSX.IntrinsicElements["wt-canvas"] & JSXBase.HTMLAttributes<HTMLWtCanvasElement>;
+            "ot-app": LocalJSX.IntrinsicElements["ot-app"] & JSXBase.HTMLAttributes<HTMLOtAppElement>;
+            "ot-canvas": LocalJSX.IntrinsicElements["ot-canvas"] & JSXBase.HTMLAttributes<HTMLOtCanvasElement>;
             /**
              * Navigation bar displayed above the waveform canvas.
              * Provides zoom controls (in / out / fit), a reload button,
              * a settings button, and a minimap slider showing the current
              * viewport position within the full waveform.
              */
-            "wt-canvas-nav": LocalJSX.IntrinsicElements["wt-canvas-nav"] & JSXBase.HTMLAttributes<HTMLWtCanvasNavElement>;
+            "ot-canvas-nav": LocalJSX.IntrinsicElements["ot-canvas-nav"] & JSXBase.HTMLAttributes<HTMLOtCanvasNavElement>;
             /**
              * Properties panel shown below the sidebar.
              * Displays and edits shared display properties for the currently
              * selected signal(s): color, fill, renderer mode, endianness, radix,
              * and waveform height.
              */
-            "wt-properties": LocalJSX.IntrinsicElements["wt-properties"] & JSXBase.HTMLAttributes<HTMLWtPropertiesElement>;
+            "ot-properties": LocalJSX.IntrinsicElements["ot-properties"] & JSXBase.HTMLAttributes<HTMLOtPropertiesElement>;
             /**
              * Modal dialog for browsing and adding VCD signals to the waveform display.
              * Shows a hierarchical module tree on the left and a filterable signal list
              * on the right.  Supports multi-select (ctrl/shift), keyboard navigation,
              * and type-based filtering (wire, reg, logic, etc.).
              */
-            "wt-search": LocalJSX.IntrinsicElements["wt-search"] & JSXBase.HTMLAttributes<HTMLWtSearchElement>;
+            "ot-search": LocalJSX.IntrinsicElements["ot-search"] & JSXBase.HTMLAttributes<HTMLOtSearchElement>;
             /**
              * Settings panel component.
              * Provides tabbed UI for:
@@ -1088,35 +1088,35 @@ declare module "@stencil/core" {
              *  - About page (rebranded to OpenTrace)
              * All licensing / activation functionality has been removed.
              */
-            "wt-settings": LocalJSX.IntrinsicElements["wt-settings"] & JSXBase.HTMLAttributes<HTMLWtSettingsElement>;
+            "ot-settings": LocalJSX.IntrinsicElements["ot-settings"] & JSXBase.HTMLAttributes<HTMLOtSettingsElement>;
             /**
              * Main sidebar container for the signal list.
              * Manages:
-             *  - Rendering the ordered list of signals via `wt-sidebar-item`.
+             *  - Rendering the ordered list of signals via `ot-sidebar-item`.
              *  - Multi-select with Ctrl click, adjacent navigation with arrows.
              *  - Drag-and-drop reordering of signals.
              *  - A footer with "Add Signals" and delete buttons.
-             *  - Delegates to `wt-properties` for bulk property editing.
+             *  - Delegates to `ot-properties` for bulk property editing.
              */
-            "wt-sidebar": LocalJSX.IntrinsicElements["wt-sidebar"] & JSXBase.HTMLAttributes<HTMLWtSidebarElement>;
+            "ot-sidebar": LocalJSX.IntrinsicElements["ot-sidebar"] & JSXBase.HTMLAttributes<HTMLOtSidebarElement>;
             /**
              * Renders a single signal row inside the sidebar.
              * For **group** signals it shows a group header with an editable alias
-             * and recursively renders children as nested `wt-sidebar-item` elements.
+             * and recursively renders children as nested `ot-sidebar-item` elements.
              * For **divider** signals it renders a blank header.
              * For all other types it renders the icon, optional bus-size badge,
              * signal name (with scope), and the current value display.
              */
-            "wt-sidebar-item": LocalJSX.IntrinsicElements["wt-sidebar-item"] & JSXBase.HTMLAttributes<HTMLWtSidebarItemElement>;
+            "ot-sidebar-item": LocalJSX.IntrinsicElements["ot-sidebar-item"] & JSXBase.HTMLAttributes<HTMLOtSidebarItemElement>;
             /**
              * Scrollable, drag-reorderable signal list container.
              * This is a lightweight generic drag-and-drop list used for
-             * prototyping reorder behaviour.  The main sidebar (`wt-sidebar`)
+             * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
              * has its own built-in drag logic that supersedes this component for
-             * the primary signal list, but `wt-sidebar-list` is retained as a
+             * the primary signal list, but `ot-sidebar-list` is retained as a
              * reusable primitive.
              */
-            "wt-sidebar-list": LocalJSX.IntrinsicElements["wt-sidebar-list"] & JSXBase.HTMLAttributes<HTMLWtSidebarListElement>;
+            "ot-sidebar-list": LocalJSX.IntrinsicElements["ot-sidebar-list"] & JSXBase.HTMLAttributes<HTMLOtSidebarListElement>;
             /**
              * Inline property editor for a single signal.
              * Displays a color picker, renderer-type toggle buttons
@@ -1124,7 +1124,7 @@ declare module "@stencil/core" {
              * Emits `waveformChanged` when any property is modified so the
              * parent can update the canvas.
              */
-            "wt-sidebar-prop": LocalJSX.IntrinsicElements["wt-sidebar-prop"] & JSXBase.HTMLAttributes<HTMLWtSidebarPropElement>;
+            "ot-sidebar-prop": LocalJSX.IntrinsicElements["ot-sidebar-prop"] & JSXBase.HTMLAttributes<HTMLOtSidebarPropElement>;
             /**
              * Dropdown menu for selecting the display radix of a signal value.
              * Lists all `Radix` members (bin, oct, hex, unsigned, signed, ascii,
@@ -1132,8 +1132,8 @@ declare module "@stencil/core" {
              * Emits `waveformChanged` on selection and `select` to let the
              * parent know a choice was made (so it can close the dropdown).
              */
-            "wt-sidebar-radix": LocalJSX.IntrinsicElements["wt-sidebar-radix"] & JSXBase.HTMLAttributes<HTMLWtSidebarRadixElement>;
-            "wt-window": LocalJSX.IntrinsicElements["wt-window"] & JSXBase.HTMLAttributes<HTMLWtWindowElement>;
+            "ot-sidebar-radix": LocalJSX.IntrinsicElements["ot-sidebar-radix"] & JSXBase.HTMLAttributes<HTMLOtSidebarRadixElement>;
+            "ot-window": LocalJSX.IntrinsicElements["ot-window"] & JSXBase.HTMLAttributes<HTMLOtWindowElement>;
         }
     }
 }

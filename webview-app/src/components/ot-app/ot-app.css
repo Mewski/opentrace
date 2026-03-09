@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------
- * wt-app component styles
+ * ot-app component styles
  * ---------------------------------------------------------------- */
 
 :host {
@@ -55,14 +55,14 @@ aside {
   padding: 0;
 }
 
-wt-canvas {
+ot-canvas {
   display: flex;
   flex-flow: column nowrap;
   width: 100%;
   height: 100%;
 }
 
-wt-canvas wt-canvas-nav {
+ot-canvas ot-canvas-nav {
   margin-top: -40px;
   display: flex;
   width: 100%;

@@ -254,7 +254,7 @@ class VCDEditor extends Disposable {
                 <title>opentrace</title>
             </head>
             <body>
-                <wt-app id="app"></wt-app>
+                <ot-app id="app"></ot-app>
                 <link href="${escapeAttribute(this.extensionResource('/media/build/opentrace/opentrace.css'))}" rel="stylesheet" />
                 <script src="${escapeAttribute(this.extensionResource('/media/build/opentrace/opentrace.esm.js'))}" type="module" nonce="${nonce}"></script>
                 <script src="${escapeAttribute(this.extensionResource('/media/renderer.js'))}" nonce="${nonce}"></script>

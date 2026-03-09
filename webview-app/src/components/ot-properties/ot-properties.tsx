@@ -9,11 +9,11 @@ import { Signal, SignalType, RendererType, Radix } from '../../utils/types';
  * and waveform height.
  */
 @Component({
-  tag: 'wt-properties',
-  styleUrl: 'wt-properties.css',
+  tag: 'ot-properties',
+  styleUrl: 'ot-properties.css',
   shadow: true,
 })
-export class WtProperties {
+export class OtProperties {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props

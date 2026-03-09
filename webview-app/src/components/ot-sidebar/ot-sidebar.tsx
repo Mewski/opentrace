@@ -5,18 +5,18 @@ import { Signal, SignalType } from '../../utils/types';
  * Main sidebar container for the signal list.
  *
  * Manages:
- *  - Rendering the ordered list of signals via `wt-sidebar-item`.
+ *  - Rendering the ordered list of signals via `ot-sidebar-item`.
  *  - Multi-select with Ctrl click, adjacent navigation with arrows.
  *  - Drag-and-drop reordering of signals.
  *  - A footer with "Add Signals" and delete buttons.
- *  - Delegates to `wt-properties` for bulk property editing.
+ *  - Delegates to `ot-properties` for bulk property editing.
  */
 @Component({
-  tag: 'wt-sidebar',
-  styleUrl: 'wt-sidebar.css',
+  tag: 'ot-sidebar',
+  styleUrl: 'ot-sidebar.css',
   shadow: true,
 })
-export class WtSidebar {
+export class OtSidebar {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ Props
@@ -176,7 +176,7 @@ export class WtSidebar {
       getComputedStyle(this.el).getPropertyValue('--axis-height') || '38',
     );
 
-    const items = this.el.shadowRoot!.querySelectorAll('wt-sidebar-item');
+    const items = this.el.shadowRoot!.querySelectorAll('ot-sidebar-item');
     const topOffset = this.el.getBoundingClientRect().top + window.scrollY + axisHeight;
     const startY = evt.pageY;
     target.style.zIndex = '200';
@@ -250,7 +250,7 @@ export class WtSidebar {
   /** Select all signals. */
   @Method()
   async selectAll() {
-    const items = this.el.shadowRoot?.querySelectorAll('wt-sidebar-item');
+    const items = this.el.shadowRoot?.querySelectorAll('ot-sidebar-item');
     if (!items) return;
     let lastId: number | null = null;
     items.forEach(item => {
@@ -270,7 +270,7 @@ export class WtSidebar {
   /** Select the next or previous adjacent signal. */
   @Method()
   async selectAdjacent(forward: boolean = true) {
-    const selected = this.el.shadowRoot?.querySelectorAll('wt-sidebar-item.selected');
+    const selected = this.el.shadowRoot?.querySelectorAll('ot-sidebar-item.selected');
     if (!selected?.length) return;
     const anchor = selected.item(forward ? selected.length - 1 : 0);
     const sibling = forward ? anchor.nextElementSibling : anchor.previousElementSibling;
@@ -288,7 +288,7 @@ export class WtSidebar {
   /** Move selected signals up or down in the list. */
   @Method()
   async moveSelectedSignals(direction: number = 0) {
-    const selected = this.el.shadowRoot?.querySelectorAll('wt-sidebar-item.selected');
+    const selected = this.el.shadowRoot?.querySelectorAll('ot-sidebar-item.selected');
     if (!selected) return;
     for (let i = 0; i < selected.length; i++) {
       const sig = (selected.item(i) as any)._signal ?? (selected.item(i) as any).signal;
@@ -307,7 +307,7 @@ export class WtSidebar {
   /** Return selected signal IDs and clear the selection classes. */
   @Method()
   async getSelected(): Promise<number[]> {
-    const items = this.el.shadowRoot?.querySelectorAll('wt-sidebar-item');
+    const items = this.el.shadowRoot?.querySelectorAll('ot-sidebar-item');
     if (!items) return [];
     const ids: number[] = [];
     const selectedItems: HTMLElement[] = [];
@@ -349,16 +349,16 @@ export class WtSidebar {
     return result;
   }
 
-  /** Refresh the wt-properties panel after selection changes. */
+  /** Refresh the ot-properties panel after selection changes. */
   private refreshProperties(): void {
-    const props = this.el.shadowRoot?.getElementById('wt-properties-0') as any;
+    const props = this.el.shadowRoot?.getElementById('ot-properties-0') as any;
     props?.requestUpdate?.('signals');
   }
 
   /** Recalculate signal positions after layout changes. */
   @Method()
   async resize(): Promise<boolean> {
-    const items = this.el.shadowRoot?.querySelectorAll('wt-sidebar-item');
+    const items = this.el.shadowRoot?.querySelectorAll('ot-sidebar-item');
     if (items) {
       items.forEach(item => (item as any).resizeSignal?.());
     }
@@ -369,7 +369,7 @@ export class WtSidebar {
   /** Update cursor values for all visible signals. */
   @Method()
   async updateCursor(values: Record<string, string>) {
-    const items = this.el.shadowRoot?.querySelectorAll('wt-sidebar-item');
+    const items = this.el.shadowRoot?.querySelectorAll('ot-sidebar-item');
     if (!items) return;
     items.forEach(item => {
       const sig = (item as any)._signal ?? (item as any).signal;
@@ -414,7 +414,7 @@ export class WtSidebar {
     const id = signal.type === SignalType.group ? `wg-${signal.id}` : `wi-${signal.id}`;
 
     return (
-      <wt-sidebar-item
+      <ot-sidebar-item
         signal={signal}
         id={id}
         class={classes}
@@ -502,7 +502,7 @@ export class WtSidebar {
       </svg>,
 
       // Properties panel
-      <wt-properties id="wt-properties-0" signals={this.selectedSignals} />,
+      <ot-properties id="ot-properties-0" signals={this.selectedSignals} />,
 
       // Scrollable signal list
       <nav id="nav0">
