@@ -52,3 +52,7 @@ npm run compile
 ```
 
 Press F5 in VSCode to launch the Extension Development Host.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
