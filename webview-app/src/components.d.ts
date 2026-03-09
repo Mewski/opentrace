@@ -48,6 +48,10 @@ export namespace Components {
          */
         "fileChanged": () => Promise<void>;
         /**
+          * Get hierarchy node data from the WASM parser.
+         */
+        "getNodes": () => Promise<string>;
+        /**
           * Import signals from a JSON string (e.g. saved workspace).
          */
         "import": (json: string) => Promise<void>;
@@ -60,13 +64,21 @@ export namespace Components {
          */
         "parse": (data: any) => Promise<void>;
         /**
+          * Parse a binary waveform file (FST, GHW, or binary VCD) using the wellen backend.
+         */
+        "parseBytes": (data: Uint8Array) => Promise<void>;
+        /**
+          * Redo a previously undone signal operation.
+         */
+        "redo": () => Promise<void>;
+        /**
           * Force a canvas redraw / resize.
          */
         "redraw": () => Promise<void>;
         /**
-          * Set machine info (WASM module metadata). All licensing logic has been removed – just stores the machine data.
+          * Undo the last signal operation.
          */
-        "setMachine": (machine: any) => Promise<void>;
+        "undo": () => Promise<void>;
     }
     interface OtCanvas {
         /**
@@ -78,14 +90,26 @@ export namespace Components {
          */
         "config"?: AppConfig;
         /**
-          * Remove one or more signals by id.
+          * Remove one or more signals by id. Accepts Signal objects or numeric ids.
          */
-        "delete": (...signals: Signal[]) => Promise<void>;
+        "delete": (...items: (Signal | number)[]) => Promise<void>;
         /**
           * Whether the backing waveform file has changed on disk.
           * @default false
          */
         "fileChanged": boolean;
+        /**
+          * Get the time delta between the two cursors.
+         */
+        "getCursorDelta": () => Promise<number>;
+        /**
+          * Get position of both cursors.
+         */
+        "getCursorPositions": () => Promise<{ primary: number; secondary: number; }>;
+        /**
+          * Rebind keyboard shortcuts after config change.
+         */
+        "input": () => Promise<void>;
         /**
           * Navigate to the next edge of the active signal.
          */
@@ -102,6 +126,10 @@ export namespace Components {
           * Map of signal id -> signal metadata, keyed by numeric id.
          */
         "signals": Map<number, Signal> | null;
+        /**
+          * Toggle between primary and secondary cursor.
+         */
+        "toggleActiveCursor": () => Promise<void>;
         /**
           * Re-evaluate cursor values without moving it.
          */
@@ -123,6 +151,10 @@ export namespace Components {
           * Position the primary cursor marker at the given percentage (0-100).
          */
         "setPrimaryMarker": (pct: number) => Promise<void>;
+        /**
+          * Position the secondary cursor marker at the given percentage (0-100).
+         */
+        "setSecondaryMarker": (pct: number) => Promise<void>;
         /**
           * Update the viewport data and refresh the minimap preview.
          */
@@ -270,21 +302,6 @@ export namespace Components {
         "value": string;
     }
     /**
-     * Scrollable, drag-reorderable signal list container.
-     * This is a lightweight generic drag-and-drop list used for
-     * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
-     * has its own built-in drag logic that supersedes this component for
-     * the primary signal list, but `ot-sidebar-list` is retained as a
-     * reusable primitive.
-     */
-    interface OtSidebarList {
-        /**
-          * Signal items to display. The setter copies the reference and triggers a re-render.
-          * @default []
-         */
-        "signals": Signal[];
-    }
-    /**
      * Inline property editor for a single signal.
      * Displays a color picker, renderer-type toggle buttons
      * (digital / step / linear), and a format button.
@@ -324,7 +341,7 @@ export namespace Components {
          */
         "backgroundBlur": boolean;
         /**
-          * Hide the window and deselect any machine-list entries.
+          * Hide the window.
          */
         "hide": () => Promise<void>;
         /**
@@ -389,7 +406,7 @@ export interface OtSidebarRadixCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
     interface HTMLColorPickerElementEventMap {
-        "change": { color: string; fill: number };
+        "colorChange": { color: string; fill: number };
     }
     /**
      * Color selection widget.
@@ -418,6 +435,7 @@ declare global {
         "file-reload": {};
         "config-save": string;
         "config-reset": {};
+        "state-changed": {};
         "config-reload": {};
         "settings-json": {};
         "open-website": {};
@@ -455,7 +473,7 @@ declare global {
         new (): HTMLOtCanvasElement;
     };
     interface HTMLOtCanvasNavElementEventMap {
-        "change": { cmd: string; value?: number };
+        "viewportChange": { cmd: string; value?: number };
         "file-reload": {};
         "settings": {};
     }
@@ -608,20 +626,6 @@ declare global {
         prototype: HTMLOtSidebarItemElement;
         new (): HTMLOtSidebarItemElement;
     };
-    /**
-     * Scrollable, drag-reorderable signal list container.
-     * This is a lightweight generic drag-and-drop list used for
-     * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
-     * has its own built-in drag logic that supersedes this component for
-     * the primary signal list, but `ot-sidebar-list` is retained as a
-     * reusable primitive.
-     */
-    interface HTMLOtSidebarListElement extends Components.OtSidebarList, HTMLStencilElement {
-    }
-    var HTMLOtSidebarListElement: {
-        prototype: HTMLOtSidebarListElement;
-        new (): HTMLOtSidebarListElement;
-    };
     interface HTMLOtSidebarPropElementEventMap {
         "waveformChanged": SignalDisplay;
         "resizeSignals": void;
@@ -649,7 +653,7 @@ declare global {
     };
     interface HTMLOtSidebarRadixElementEventMap {
         "waveformChanged": SignalDisplay;
-        "select": void;
+        "radixSelect": void;
         "resizeSignals": void;
     }
     /**
@@ -689,7 +693,6 @@ declare global {
         "ot-settings": HTMLOtSettingsElement;
         "ot-sidebar": HTMLOtSidebarElement;
         "ot-sidebar-item": HTMLOtSidebarItemElement;
-        "ot-sidebar-list": HTMLOtSidebarListElement;
         "ot-sidebar-prop": HTMLOtSidebarPropElement;
         "ot-sidebar-radix": HTMLOtSidebarRadixElement;
         "ot-window": HTMLOtWindowElement;
@@ -716,7 +719,7 @@ declare namespace LocalJSX {
         /**
           * Emitted when the user selects a new color or changes the fill.
          */
-        "onChange"?: (event: ColorPickerCustomEvent<{ color: string; fill: number }>) => void;
+        "onColorChange"?: (event: ColorPickerCustomEvent<{ color: string; fill: number }>) => void;
         /**
           * Array of CSS color strings to show in the swatch palette.
           * @default DEFAULT_CONFIG.theme.palette
@@ -731,6 +734,7 @@ declare namespace LocalJSX {
         "onLog"?: (event: OtAppCustomEvent<string>) => void;
         "onOpen-website"?: (event: OtAppCustomEvent<{}>) => void;
         "onSettings-json"?: (event: OtAppCustomEvent<{}>) => void;
+        "onState-changed"?: (event: OtAppCustomEvent<{}>) => void;
         "onVcd-done"?: (event: OtAppCustomEvent<void>) => void;
         "onVcd-ready"?: (event: OtAppCustomEvent<void>) => void;
     }
@@ -770,10 +774,6 @@ declare namespace LocalJSX {
          */
         "fileChanged"?: boolean;
         /**
-          * Emitted when the user requests a viewport change (zoom, goto).
-         */
-        "onChange"?: (event: OtCanvasNavCustomEvent<{ cmd: string; value?: number }>) => void;
-        /**
           * Emitted when the user clicks the reload button.
          */
         "onFile-reload"?: (event: OtCanvasNavCustomEvent<{}>) => void;
@@ -781,6 +781,10 @@ declare namespace LocalJSX {
           * Emitted when the user clicks the settings button.
          */
         "onSettings"?: (event: OtCanvasNavCustomEvent<{}>) => void;
+        /**
+          * Emitted when the user requests a viewport change (zoom, goto).
+         */
+        "onViewportChange"?: (event: OtCanvasNavCustomEvent<{ cmd: string; value?: number }>) => void;
     }
     /**
      * Properties panel shown below the sidebar.
@@ -916,21 +920,6 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     /**
-     * Scrollable, drag-reorderable signal list container.
-     * This is a lightweight generic drag-and-drop list used for
-     * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
-     * has its own built-in drag logic that supersedes this component for
-     * the primary signal list, but `ot-sidebar-list` is retained as a
-     * reusable primitive.
-     */
-    interface OtSidebarList {
-        /**
-          * Signal items to display. The setter copies the reference and triggers a re-render.
-          * @default []
-         */
-        "signals"?: Signal[];
-    }
-    /**
      * Inline property editor for a single signal.
      * Displays a color picker, renderer-type toggle buttons
      * (digital / step / linear), and a format button.
@@ -966,13 +955,13 @@ declare namespace LocalJSX {
      */
     interface OtSidebarRadix {
         /**
+          * Emitted after a radix is selected (used by parent to close the menu).
+         */
+        "onRadixSelect"?: (event: OtSidebarRadixCustomEvent<void>) => void;
+        /**
           * Requests a full signal-height recalculation.
          */
         "onResizeSignals"?: (event: OtSidebarRadixCustomEvent<void>) => void;
-        /**
-          * Emitted after a radix is selected (used by parent to close the menu).
-         */
-        "onSelect"?: (event: OtSidebarRadixCustomEvent<void>) => void;
         /**
           * Emitted when the radix changes.
          */
@@ -1040,7 +1029,6 @@ declare namespace LocalJSX {
         "ot-settings": OtSettings;
         "ot-sidebar": Omit<OtSidebar, keyof OtSidebarAttributes> & { [K in keyof OtSidebar & keyof OtSidebarAttributes]?: OtSidebar[K] } & { [K in keyof OtSidebar & keyof OtSidebarAttributes as `attr:${K}`]?: OtSidebarAttributes[K] } & { [K in keyof OtSidebar & keyof OtSidebarAttributes as `prop:${K}`]?: OtSidebar[K] };
         "ot-sidebar-item": Omit<OtSidebarItem, keyof OtSidebarItemAttributes> & { [K in keyof OtSidebarItem & keyof OtSidebarItemAttributes]?: OtSidebarItem[K] } & { [K in keyof OtSidebarItem & keyof OtSidebarItemAttributes as `attr:${K}`]?: OtSidebarItemAttributes[K] } & { [K in keyof OtSidebarItem & keyof OtSidebarItemAttributes as `prop:${K}`]?: OtSidebarItem[K] };
-        "ot-sidebar-list": OtSidebarList;
         "ot-sidebar-prop": Omit<OtSidebarProp, keyof OtSidebarPropAttributes> & { [K in keyof OtSidebarProp & keyof OtSidebarPropAttributes]?: OtSidebarProp[K] } & { [K in keyof OtSidebarProp & keyof OtSidebarPropAttributes as `attr:${K}`]?: OtSidebarPropAttributes[K] } & { [K in keyof OtSidebarProp & keyof OtSidebarPropAttributes as `prop:${K}`]?: OtSidebarProp[K] };
         "ot-sidebar-radix": OtSidebarRadix;
         "ot-window": Omit<OtWindow, keyof OtWindowAttributes> & { [K in keyof OtWindow & keyof OtWindowAttributes]?: OtWindow[K] } & { [K in keyof OtWindow & keyof OtWindowAttributes as `attr:${K}`]?: OtWindowAttributes[K] } & { [K in keyof OtWindow & keyof OtWindowAttributes as `prop:${K}`]?: OtWindow[K] };
@@ -1108,15 +1096,6 @@ declare module "@stencil/core" {
              * signal name (with scope), and the current value display.
              */
             "ot-sidebar-item": LocalJSX.IntrinsicElements["ot-sidebar-item"] & JSXBase.HTMLAttributes<HTMLOtSidebarItemElement>;
-            /**
-             * Scrollable, drag-reorderable signal list container.
-             * This is a lightweight generic drag-and-drop list used for
-             * prototyping reorder behaviour.  The main sidebar (`ot-sidebar`)
-             * has its own built-in drag logic that supersedes this component for
-             * the primary signal list, but `ot-sidebar-list` is retained as a
-             * reusable primitive.
-             */
-            "ot-sidebar-list": LocalJSX.IntrinsicElements["ot-sidebar-list"] & JSXBase.HTMLAttributes<HTMLOtSidebarListElement>;
             /**
              * Inline property editor for a single signal.
              * Displays a color picker, renderer-type toggle buttons
