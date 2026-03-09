@@ -30,7 +30,7 @@ export class ColorPicker {
   // ---------------------------------------------------------------- Events
 
   /** Emitted when the user selects a new color or changes the fill. */
-  @Event() change!: EventEmitter<{ color: string; fill: number }>;
+  @Event({ eventName: 'colorChange' }) colorChange!: EventEmitter<{ color: string; fill: number }>;
 
   // ------------------------------------------------------------- Lifecycle
 
@@ -108,20 +108,20 @@ export class ColorPicker {
   private handleFillChange = () => {
     const slider = this.el.shadowRoot!.getElementById('fill') as HTMLInputElement;
     this.fill = parseInt(slider.value) / 100;
-    this.change.emit({ color: this.color, fill: this.fill });
+    this.colorChange.emit({ color: this.color, fill: this.fill });
   };
 
   private selectColor = (evt: MouseEvent) => {
     const target = evt.currentTarget as HTMLElement;
     this.color = target.style.backgroundColor;
-    this.change.emit({ color: this.color, fill: this.fill });
+    this.colorChange.emit({ color: this.color, fill: this.fill });
   };
 
   private finalizeColor = (evt: MouseEvent) => {
     const target = evt.currentTarget as HTMLElement;
     this.color = target.style.backgroundColor;
     this.togglePicker();
-    this.change.emit({ color: this.color, fill: this.fill });
+    this.colorChange.emit({ color: this.color, fill: this.fill });
   };
 
   private showPreview = (evt: MouseEvent) => {

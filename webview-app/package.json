@@ -3,6 +3,8 @@
     "version": "1.0.0",
     "private": true,
     "description": "OpenTrace webview application",
+    "main": "../media/build/index.cjs.js",
+    "collection": "../media/build/collection/collection-manifest.json",
     "scripts": {
         "build": "stencil build",
         "dev": "stencil build --dev --watch",

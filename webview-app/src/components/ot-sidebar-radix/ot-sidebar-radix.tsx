@@ -28,7 +28,7 @@ export class OtSidebarRadix {
   @Event({ bubbles: true, composed: true }) waveformChanged!: EventEmitter<SignalDisplay>;
 
   /** Emitted after a radix is selected (used by parent to close the menu). */
-  @Event() select!: EventEmitter<void>;
+  @Event({ eventName: 'radixSelect' }) radixSelect!: EventEmitter<void>;
 
   /** Requests a full signal-height recalculation. */
   @Event({ bubbles: true, composed: true }) resizeSignals!: EventEmitter<void>;
@@ -46,7 +46,7 @@ export class OtSidebarRadix {
     const key = target.id;
     this.options.radix = (Radix as any)[key] ?? key;
     this.dispatchUpdate();
-    this.select.emit();
+    this.radixSelect.emit();
   };
 
   private dispatchUpdate(): void {

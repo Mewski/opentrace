@@ -97,7 +97,7 @@ export class OtSidebarProp {
       <div class="prop-color">
         <color-picker
           id="picker0"
-          onChange={this.handleColor}
+          onColorChange={this.handleColor}
           color={this.options.color}
           fill={typeof this.options.fill === 'number' ? this.options.fill : parseFloat(this.options.fill as string) || 0}
         />

@@ -153,7 +153,7 @@ export class OtProperties {
         <div id="prop-color" class="item">
           <color-picker
             id="picker0"
-            onChange={this.setColor}
+            onColorChange={this.setColor}
             color={this.commonColor}
             fill={this.commonFill}
           />

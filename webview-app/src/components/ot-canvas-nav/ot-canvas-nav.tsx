@@ -47,7 +47,7 @@ export class OtCanvasNav {
 
   // ----------------------------------------------------------------- Events
   /** Emitted when the user requests a viewport change (zoom, goto). */
-  @Event() change!: EventEmitter<{ cmd: string; value?: number }>;
+  @Event({ eventName: 'viewportChange' }) viewportChange!: EventEmitter<{ cmd: string; value?: number }>;
 
   /** Emitted when the user clicks the reload button. */
   @Event({ eventName: 'file-reload', bubbles: true, composed: true })
@@ -154,15 +154,15 @@ export class OtCanvasNav {
   };
 
   private handleZoomIn = () => {
-    this.change.emit({ cmd: 'zoom_in' });
+    this.viewportChange.emit({ cmd: 'zoom_in' });
   };
 
   private handleZoomFit = () => {
-    this.change.emit({ cmd: 'zoom_fit' });
+    this.viewportChange.emit({ cmd: 'zoom_fit' });
   };
 
   private handleZoomOut = () => {
-    this.change.emit({ cmd: 'zoom_out' });
+    this.viewportChange.emit({ cmd: 'zoom_out' });
   };
 
   private handlePointerMove = (evt: PointerEvent) => {
@@ -175,7 +175,7 @@ export class OtCanvasNav {
     if (evt.buttons & 1) {
       const rect = navBar!.getClientRects()[0];
       const pct = Math.max(Math.min(evt.offsetX / rect.width, 1), 0);
-      this.change.emit({ cmd: 'goto', value: pct * this._viewport.length });
+      this.viewportChange.emit({ cmd: 'goto', value: pct * this._viewport.length });
     }
   };
 

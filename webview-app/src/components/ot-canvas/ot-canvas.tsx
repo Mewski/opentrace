@@ -507,7 +507,7 @@ export class OtCanvas {
       <ot-canvas-nav
         id="ot-canvas-nav-0"
         fileChanged={this.fileChanged}
-        onChange={(e: CustomEvent) => this.updateViewport(e)}
+        onViewportChange={(e: CustomEvent) => this.updateViewport(e)}
       />
     );
   }
