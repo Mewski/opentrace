@@ -51,12 +51,16 @@
         "vscode:prepublish": "npm run build:webview && webpack --mode production",
         "compile": "webpack --mode development",
         "watch": "webpack --mode development --watch",
+        "build:wasm": "cd media/crate && wasm-pack build --target web --out-dir pkg --release",
+        "bundle:wasm": "node scripts/bundle-wasm.js",
+        "build:core": "npm run build:wasm && npm run bundle:wasm",
         "build:webview": "cd webview-app && npm run build",
         "test": "mocha",
         "test-compile": "tsc -p ./",
         "lint": "eslint src --ext .ts",
         "lint:fix": "eslint src --ext .ts --fix",
-        "format": "prettier --write \"src/**/*.ts\" \"*.json\" \".vscode/**/*.json\" \"schemas/**/*.json\""
+        "format": "prettier --write \"src/**/*.ts\" \"*.json\" \".vscode/**/*.json\" \"schemas/**/*.json\"",
+        "format:rust": "cd media/crate && cargo fmt"
     },
     "devDependencies": {
         "@types/glob": "^8.1.0",

@@ -7,3 +7,5 @@ webview-app/node_modules/
 webview-app/www/
 webview-app/.stencil/
 media/build/
+.direnv/
+result
