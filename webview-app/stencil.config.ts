@@ -10,6 +10,9 @@ export const config: Config = {
     ],
     globalStyle: 'src/global/app.css',
     buildEs5: false,
+    nodeResolve: {
+        preferBuiltins: true
+    },
     rollupPlugins: {
         before: [
             {
