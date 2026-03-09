@@ -28,7 +28,7 @@
                 "window": {
                     "$ref": "#/definitions/WindowConfig",
                     "description": "Window Configuration"
-                },
+                }
             },
             "required": ["display", "keyboard", "mouse", "sidebar", "theme", "window"],
             "additionalProperties": false,
