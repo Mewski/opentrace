@@ -1,0 +1,14 @@
+:root {
+    --font-monospace-family: monospace;
+    --font-monospace-weight: normal;
+    --font-monospace-size: 13px;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}

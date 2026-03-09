@@ -1,0 +1,70 @@
+/* ----------------------------------------------------------------
+ * wt-app component styles
+ * ---------------------------------------------------------------- */
+
+:host {
+  height: 100%;
+  overflow: hidden;
+  --sidebar-width: 150px;
+  display: flex;
+}
+
+:host > aside {
+  position: relative;
+  left: 0;
+}
+
+:host > main {
+  position: relative;
+  top: 0px;
+  left: 0px;
+}
+
+:host > aside,
+:host > main {
+  overflow: none;
+}
+
+.resize-handle--x {
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+  position: relative;
+  box-sizing: border-box;
+  width: 3px;
+  height: 100%;
+  background: var(--sidebar-border);
+  cursor: ew-resize;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+aside {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  background: var(--sidebar);
+  border-right: 0px solid var(--sidebar-border);
+  box-shadow: var(--shadow) 0 10px 10px;
+  margin: 0;
+  padding: 0;
+}
+
+wt-canvas {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 100%;
+  height: 100%;
+}
+
+wt-canvas wt-canvas-nav {
+  margin-top: -40px;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}

@@ -1,0 +1,70 @@
+/* ----------------------------------------------------------------
+ * wt-window component styles
+ * ---------------------------------------------------------------- */
+
+:host {
+  --margin: 0.5em;
+
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s;
+}
+
+.blur {
+  background: black;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.window {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+
+  background: var(--window-background);
+  border: 1px solid var(--window-border);
+  border-radius: var(--window-radius);
+  box-shadow: var(--shadow) 0px 0px 15px;
+  display: block;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: var(--window-title-foreground);
+  padding: calc(var(--margin));
+  padding-top: calc(var(--margin) * 1.5);
+  border-radius: var(--window-radius) var(--window-radius) 0 0;
+  background: linear-gradient(80deg, var(--accent) 0%, var(--accent-bright) 100%);
+  box-sizing: border-box;
+  box-shadow: var(--shadow) 0px -1px 5px;
+}
+
+.subtitle {
+  font-size: 1em;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.25em;
+  margin-top: 1em;
+  padding-left: var(--margin);
+}
+
+.container {
+  margin: var(--margin);
+  box-sizing: border-box;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}

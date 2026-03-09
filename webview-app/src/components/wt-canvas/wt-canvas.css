@@ -1,0 +1,23 @@
+/*
+ * wt-canvas uses createRenderRoot() { return this; } in the original,
+ * meaning it renders into the light DOM with no shadow root.
+ * Styles are therefore applied at the host / document level.
+ *
+ * The PIXI canvas is prepended as a direct child; the wt-canvas-nav
+ * is rendered via the component template. No additional scoped CSS
+ * is needed beyond what the PIXI application and the nav bar provide.
+ */
+
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

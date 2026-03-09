@@ -1,0 +1,136 @@
+:host {
+}
+
+.container {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+  height: calc(var(--axis-height));
+  width: calc(100% + 3px);
+  background: var(--axis-background);
+  border-bottom: 0px solid var(--axis-line);
+  padding: 8px 8px;
+  box-sizing: border-box;
+}
+
+.item {
+  height: 100%;
+  margin-right: 1px;
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+  max-width: 26px;
+}
+
+select {
+  font-size: 0.65rem;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+
+#picker0 {
+  width: 24px;
+}
+
+#prop-color {
+  display: inline-flex;
+  max-width: calc(var(--axis-height));
+  width: 100%;
+  height: 100%;
+}
+
+#prop-endian {
+  /* Temporary */
+  display: none;
+}
+
+select[disabled] {
+  opacity: 0.25;
+}
+
+.hgroup {
+  display: flex;
+  height: 100%;
+}
+
+.hgroup div {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  padding: 4px;
+  box-sizing: border-box;
+  height: 100%;
+  border: 1px solid var(--input-border);
+  background: var(--input-background);
+  opacity: 0.5;
+  pointer-events: all;
+}
+
+.vgroup div[disabled],
+.hgroup div[disabled] {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.vgroup div:not([disabled]):hover,
+.hgroup div:not([disabled]):hover {
+  background: var(--input-hover);
+  cursor: pointer;
+}
+
+.vgroup div:not([disabled])[selected],
+.hgroup div:not([disabled])[selected] {
+  opacity: 1;
+  border-color: var(--input-active-border);
+  color: var(--input-active-foreground);
+}
+
+.hgroup > :first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.hgroup > :first-child:not([selected]) {
+  border-right: 0;
+}
+
+.hgroup > :nth-last-child(2):not([selected]) {
+  border-right: 0;
+}
+
+.hgroup > :last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.vgroup {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.vgroup div {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  padding: 4px;
+  box-sizing: border-box;
+  height: 50%;
+  border: 1px solid var(--input-border);
+  background: var(--input-background);
+  opacity: 0.7;
+  pointer-events: all;
+}
+
+.vgroup > :first-child {
+  border-radius: 0px 3px 0 0;
+  border-bottom: 0px;
+}
+
+.vgroup > :last-child {
+  border-radius: 0 0 3px 0;
+}

@@ -1,0 +1,73 @@
+#picker-dialog {
+  --picker-swatch-size: 15px;
+  --picker-swatch-cols: 8;
+
+  z-index: 300;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  display: none;
+  max-width: calc(var(--picker-swatch-size) * var(--picker-swatch-cols));
+  flex-flow: row wrap;
+  background: var(--picker-background);
+  border: 1px solid var(--picker-border);
+  padding: 6px;
+  box-shadow: var(--background) 0px 2px 2px;
+}
+
+#picker-icon {
+  display: block;
+  min-width: 8px;
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  background: black;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+#picker-icon:hover {
+  cursor: pointer;
+}
+
+.swatch {
+  display: inline-block;
+  width: var(--picker-swatch-size);
+  height: var(--picker-swatch-size);
+}
+
+#preview {
+  position: absolute;
+  display: none;
+  background: black;
+  width: calc(var(--picker-swatch-size) + 2px);
+  height: calc(var(--picker-swatch-size) + 2px);
+  box-shadow: black 0px 0px 1px;
+}
+
+#preview:hover {
+  cursor: pointer;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--background);
+  width: 100%;
+  height: 12px;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: var(--button);
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: var(--accent-hover);
+}

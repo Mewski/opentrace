@@ -1,0 +1,362 @@
+:host {
+  z-index: 10;
+  --sidebar-item-max-height: 40px;
+  height: 100%;
+  width: 100%;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#treeroot {
+  display: block;
+  height: 100%;
+  position: relative;
+  overflow-y: scroll;
+  line-height: 8px;
+}
+
+.wi-root {
+  overflow: hidden;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- Waveform Group ---- */
+.wg-container {
+  display: block;
+  background: var(--sidebar-group-background);
+  border-top: 1px solid var(--sidebar-group-border);
+  border-bottom: 1px solid var(--sidebar-group-border);
+  padding-bottom: 5px;
+  margin: 10px 0;
+}
+
+.wg-header {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.wg-body {
+  width: 100%;
+}
+
+/* ---- Divider ---- */
+.wd-container {
+  display: block;
+  background: var(--sidebar-item-border);
+}
+
+/* ---- Waveform Items ---- */
+.wi-container {
+  overflow: hidden;
+  border-top: 1px solid var(--sidebar-item-border);
+}
+
+.wi-container::-webkit-scrollbar {
+  display: none;
+}
+
+.wi-container.selected .wi-item {
+  background: var(--sidebar-item-selected);
+}
+
+.wi-item:hover {
+  background: var(--sidebar-item-hover);
+}
+
+.wi-container li {
+  outline: none;
+}
+
+.wi-item {
+  display: flex;
+  flex-direction: row;
+  flex-basis: 0;
+  flex-grow: 1;
+  background: var(--sidebar-item-background);
+  font-weight: var(--monospace-font-weight);
+  font-family: var(--monospace-font-family);
+  font-size: 0.75rem;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.1s;
+  outline: none;
+}
+
+.wi-label {
+  padding-left: 10px;
+  flex-grow: 8;
+  text-align: right;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  align-content: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow: hidden;
+  height: 100%;
+  max-height: var(--sidebar-item-max-height);
+}
+
+.wi-name {
+  display: inline-block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  direction: rtl;
+  text-align: right;
+  width: 100%;
+  padding: 2px;
+}
+
+.wi-radix {
+  color: #0f6;
+  background: var(--sidebar-item-radix-background);
+  display: flex;
+  text-align: right;
+  margin-left: 4px;
+  flex-direction: column;
+  flex-basis: 65px;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.wi-radix div {
+  font-family: monospace;
+  height: 100%;
+  max-height: var(--sidebar-item-max-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.wi-icon svg {
+  min-width: 20px;
+  width: 20px;
+  height: 100%;
+  max-height: var(--sidebar-item-max-height);
+  padding-left: 5px;
+  cursor: grab !important;
+}
+
+wt-sidebar-item {
+  display: inline-flex;
+  width: 100%;
+  vertical-align: top;
+}
+
+wt-sidebar-item.prop-open .wi-item .wi-icon {
+  opacity: 1;
+}
+
+.sortable-chosen wt-sidebar-item .wi-item {
+  background: var(--accent);
+}
+
+input[type='text'] {
+  background: transparent;
+  color: var(--foreground);
+}
+
+.wi-size {
+  display: flex;
+  flex-flow: column nowrap;
+  align-content: center;
+  justify-content: center;
+  flex-grow: 0;
+  max-height: var(--sidebar-item-max-height);
+  flex-shrink: 0;
+}
+
+.wi-scope {
+  opacity: 0.6;
+}
+
+.signal-size {
+  display: flex;
+  flex-flow: column nowrap;
+  align-content: center;
+  justify-content: center;
+  font-family: monospace;
+  background: var(--signalSize-background);
+  border: 1px solid var(--signalSize-border);
+  color: var(--signalSize-color);
+  text-align: center;
+  padding: 0px 2px;
+  border-radius: 5px;
+  margin: 2px 8px;
+  height: 1rem;
+  line-height: 0;
+}
+
+nav {
+  display: block;
+  height: calc(100% - var(--axis-height) - 48px);
+}
+
+svg {
+  pointer-events: none;
+  width: 18px;
+  height: 16px;
+}
+
+#header {
+  width: 100%;
+  height: var(--axis-height);
+  background: 1px solid var(--background);
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+}
+
+#header button {
+  height: calc(var(--axis-height) - 8px);
+}
+
+footer button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+footer {
+  z-index: 100;
+  background: var(--sidebar);
+  display: flex;
+  width: 100%;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---- Drag-and-drop transitions ---- */
+.item {
+  position: relative;
+  transition: none;
+  z-index: 101;
+}
+
+.item.nudgeDown:not(.dragged) {
+  transform: translate3d(0, 24px, 0);
+}
+
+.item.nudgeUp:not(.dragged) {
+  transform: translate3d(0, -24px, 0);
+}
+
+.item.dragged {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transition: none;
+}
+
+/* Only transition under .dragging so nudged items snap into place
+   once the drag completes rather than animating. */
+.dragging > .item:not(.dragged) {
+  transition: transform 0.2s ease-out;
+}
+
+/* ---- Shared button styles (inline, since shadow DOM) ---- */
+
+a {
+  color: var(--link-foreground);
+}
+
+a:active,
+a:hover {
+  color: var(--link-active);
+  cursor: pointer;
+}
+
+.btn {
+  font-family: var(--font-family);
+  background: var(--button);
+  color: var(--button-text);
+  display: inline-flex;
+  align-items: center;
+  text-align: center;
+  white-space: nowrap;
+  height: 32px;
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: all 0.1s ease-in-out;
+  line-height: 1;
+  font-size: 12px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--input-radius);
+  justify-content: center;
+}
+
+.btn:focus {
+  border: 1px solid var(--button-hover);
+}
+
+.btn:hover:enabled {
+  color: var(--foreground);
+  background: var(--button-hover);
+  cursor: pointer;
+}
+
+.btn:active {
+  background-color: var(--button-hover);
+}
+
+.btn.selected {
+  color: var(--foreground);
+  background: var(--accent);
+}
+
+.btn:disabled {
+  background: var(--button-disabled);
+  color: var(--button-disabled-text);
+  cursor: inherit;
+  opacity: 0.7;
+}
+
+.btn-wide {
+  width: calc(100% - 10px);
+}
+
+.btn.btn-primary:not(:disabled) {
+  background: var(--accent);
+  color: var(--title-color);
+  outline: 1px solid transparent;
+}
+
+.btn.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 1em;
+}
+
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-background);
+  outline: 0px solid var(--border);
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-hover);
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-active);
+  cursor: pointer;
+}

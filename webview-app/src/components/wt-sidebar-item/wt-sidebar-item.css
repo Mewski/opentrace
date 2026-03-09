@@ -1,0 +1,9 @@
+/* wt-sidebar-item styles are minimal because most layout is inherited
+   from the parent wt-sidebar component (which owns .wi-item, .wi-icon, etc.).
+   This file exists so that future per-item overrides have a home. */
+
+:host {
+  display: inline-flex;
+  width: 100%;
+  vertical-align: top;
+}

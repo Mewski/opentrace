@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  font-size: 0.65rem;
+  border-top: 1px solid var(--properties-background);
+  border-left: 1px solid var(--properties-border);
+  border-bottom: 1px solid var(--properties-border);
+  padding-bottom: 2px;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+:host ul li {
+  padding: 2px;
+  text-transform: uppercase;
+}
+
+:host ul li:hover {
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.selected {
+  background: rgba(0, 0, 0, 0.2);
+}

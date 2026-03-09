@@ -1,0 +1,192 @@
+/* ----------------------------------------------------------------
+ * wt-settings component styles
+ * ---------------------------------------------------------------- */
+
+:host {
+  display: block;
+}
+
+.subtitle {
+  font-size: 1em;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.25em;
+  margin-top: 1em;
+  padding-left: var(--margin);
+}
+
+.container {
+  box-sizing: border-box;
+}
+
+h3 {
+  margin-top: 0.25em;
+  margin-bottom: var(--margin);
+  margin-left: var(--margin);
+}
+
+/* ---- Actions bar ---- */
+
+#actions {
+  padding: var(--margin);
+  background: var(--settings-action-background);
+  box-sizing: border-box;
+}
+
+#actions .btn {
+  margin-right: var(--margin);
+}
+
+/* ---- Messages ---- */
+
+.msg {
+  font-size: 0.8em;
+  padding: var(--margin);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.msg-error {
+  color: var(--color-red);
+}
+
+/* ---- Labels / links ---- */
+
+label a {
+  font-size: 0.9em;
+  color: var(--accent);
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+label a:hover {
+  opacity: 1;
+}
+
+/* ---- Tab pages ---- */
+
+.page {
+  flex: 1;
+  display: flex;
+  box-sizing: border-box;
+  padding: var(--margin);
+}
+
+/* ---- Shortcuts page ---- */
+
+#page-shortcuts {
+  overflow: auto;
+}
+
+#page-shortcuts table {
+  width: 100%;
+  border-spacing: 0px;
+  border-collapse: separate;
+  font-family: Consolas, monospace;
+}
+
+#page-shortcuts table thead tr th {
+  position: sticky;
+  top: 0;
+  background: var(--settings-action-background);
+  border-bottom: 1px solid var(--border);
+  padding: var(--margin);
+  text-align: left;
+  z-index: 100;
+}
+
+#page-shortcuts table tbody td {
+  padding: calc(var(--margin) / 2) var(--margin);
+}
+
+#page-shortcuts table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.015) !important;
+}
+
+#page-shortcuts table tbody tr:nth-child(odd) {
+  background: rgba(0, 0, 0, 0.075);
+}
+
+.shortcut-current {
+  font-family: Consolas, monospace;
+  opacity: 0.6;
+}
+
+.shortcut-input {
+  width: 100%;
+  background: transparent !important;
+  border-top: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-bottom: 1px solid var(--foreground) !important;
+  padding: 2px 0 !important;
+  margin-bottom: 1px !important;
+  margin-left: 0px !important;
+  height: auto !important;
+}
+
+.shortcut-input.edited {
+  color: var(--accent-bright) !important;
+  border-bottom: 1px solid var(--accent) !important;
+}
+
+/* ---- Tabs layout ---- */
+
+.tabs {
+  display: flex;
+  min-width: 640px;
+  height: 300px;
+}
+
+.tabs ul {
+  padding: 0;
+  margin: 0;
+}
+
+.tab-nav {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.tab-nav li {
+  list-style-type: none;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  margin-top: 2px;
+  padding: 1em;
+  padding-right: 3em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  transition: all 0.1s;
+}
+
+.active {
+  color: var(--accent-bright);
+  background: var(--window-background);
+}
+
+.tab-nav li:hover {
+  background-color: var(--input-hover);
+  cursor: pointer;
+}
+
+.tab-nav li svg {
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+  margin-right: var(--margin);
+}
+
+/* ---- Misc ---- */
+
+input[type='text'] {
+  font-family: Consolas, monospace;
+}
+
+.external-link {
+  cursor: pointer;
+  color: var(--accent-bright);
+  text-decoration: none;
+}

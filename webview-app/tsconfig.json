@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "allowUnreachableCode": false,
+        "declaration": false,
+        "experimentalDecorators": true,
+        "forceConsistentCasingInFileNames": true,
+        "jsx": "react",
+        "jsxFactory": "h",
+        "lib": ["dom", "es2017"],
+        "module": "esnext",
+        "moduleResolution": "node",
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "strict": true,
+        "target": "es2017"
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
