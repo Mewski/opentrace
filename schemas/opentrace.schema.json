@@ -1,0 +1,338 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$ref": "#/definitions/Config",
+    "definitions": {
+        "Config": {
+            "type": "object",
+            "properties": {
+                "display": {
+                    "$ref": "#/definitions/DisplayConfig",
+                    "description": "Display Configuration"
+                },
+                "keyboard": {
+                    "$ref": "#/definitions/KeyboardConfig",
+                    "description": "Keyboard Configuration"
+                },
+                "mouse": {
+                    "$ref": "#/definitions/MouseConfig",
+                    "description": "Mouse Configuration"
+                },
+                "sidebar": {
+                    "$ref": "#/definitions/SidebarConfig",
+                    "description": "Sidebar Configuration"
+                },
+                "theme": {
+                    "$ref": "#/definitions/ThemeConfig",
+                    "description": "Theme Configuration"
+                },
+                "window": {
+                    "$ref": "#/definitions/WindowConfig",
+                    "description": "Window Configuration"
+                },
+            },
+            "required": ["display", "keyboard", "mouse", "sidebar", "theme", "window"],
+            "additionalProperties": false,
+            "description": "Config"
+        },
+        "DisplayConfig": {
+            "type": "object",
+            "properties": {
+                "disableGpu": {
+                    "type": "boolean",
+                    "description": "Disable GPU Acceleration",
+                    "default": false
+                },
+                "antialias": {
+                    "type": "boolean",
+                    "description": "Enables anti-aliasing - this may impact performance",
+                    "default": false
+                },
+                "defaultTraceStyle": {
+                    "$ref": "#/definitions/SignalDisplayOptions",
+                    "description": "Default style of traces added to the view",
+                    "default": {
+                        "renderer": "line",
+                        "color": "#00e676",
+                        "fill": 0.2,
+                        "height": 24,
+                        "radix": "hex",
+                        "littleEndian": false,
+                        "strokeWidth": 2
+                    }
+                }
+            },
+            "required": ["disableGpu", "antialias", "defaultTraceStyle"],
+            "additionalProperties": false
+        },
+        "SignalDisplayOptions": {
+            "type": "object",
+            "properties": {
+                "renderer": {
+                    "$ref": "#/definitions/SignalRenderer"
+                },
+                "alias": {
+                    "type": "string"
+                },
+                "y": {
+                    "type": "number"
+                },
+                "color": {
+                    "type": "string"
+                },
+                "fill": {
+                    "type": "number"
+                },
+                "strokeWidth": {
+                    "type": "number"
+                },
+                "radix": {
+                    "$ref": "#/definitions/SignalRadix"
+                },
+                "priority": {
+                    "type": "number"
+                },
+                "height": {
+                    "type": "number"
+                },
+                "format": {
+                    "type": "string"
+                },
+                "littleEndian": {
+                    "type": "boolean"
+                },
+                "range": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "SignalRenderer": {
+            "type": "string",
+            "enum": ["line", "bus", "step", "linear", "event"]
+        },
+        "SignalRadix": {
+            "type": "string",
+            "enum": ["bin", "oct", "hex", "unsigned", "signed", "ascii", "utf8", "float"]
+        },
+        "KeyboardConfig": {
+            "type": "object",
+            "properties": {
+                "reload": {
+                    "type": "string",
+                    "description": "Hotkey - Reloads the current waveform",
+                    "default": "ctrl+r,f5"
+                },
+                "createGroup": {
+                    "type": "string",
+                    "description": "Hotkey - Create a group from selected signals",
+                    "default": "ctrl+g"
+                },
+                "addSignal": {
+                    "type": "string",
+                    "description": "Hotkey - Add a signal to the waveform display",
+                    "default": "shift+a,insert"
+                },
+                "deleteSignal": {
+                    "type": "string",
+                    "description": "Hotkey - Delete selected signal(s) from the waveform",
+                    "default": "delete"
+                },
+                "prevEdge": {
+                    "type": "string",
+                    "description": "Hotkey - Goto the next edge of selected signal",
+                    "default": "left"
+                },
+                "nextEdge": {
+                    "type": "string",
+                    "description": "Hotkey - Goto the previous edge of selected signal",
+                    "default": "right"
+                },
+                "prevSignal": {
+                    "type": "string",
+                    "description": "Hotkey - Focus on the previous signal",
+                    "default": "up"
+                },
+                "nextSignal": {
+                    "type": "string",
+                    "description": "Hotkey - Focus on the next signal",
+                    "default": "down"
+                },
+                "moveSignalUp": {
+                    "type": "string",
+                    "description": "Hotkey - Move the selected signal(s) up",
+                    "default": "ctrl+up"
+                },
+                "moveSignalDown": {
+                    "type": "string",
+                    "description": "Hotkey - Move the selected signal(s) down",
+                    "default": "ctrl+down"
+                },
+                "selectAll": {
+                    "type": "string",
+                    "description": "Hotkey - Select all active signals",
+                    "default": "ctrl+a"
+                },
+                "zoomStart": {
+                    "type": "string",
+                    "description": "Hotkey - Scroll to the beginning of the file",
+                    "default": "home"
+                },
+                "zoomEnd": {
+                    "type": "string",
+                    "description": "Hotkey - Scroll to the end of the file",
+                    "default": "end"
+                },
+                "zoomIn": {
+                    "type": "string",
+                    "description": "Hotkey - Zooom In (expand the waveform)",
+                    "default": "pageUp"
+                },
+                "zoomOut": {
+                    "type": "string",
+                    "description": "Hotkey - Zooom Out (shink the waveform)",
+                    "default": "pageDown"
+                },
+                "zoomFit": {
+                    "type": "string",
+                    "description": "Hotkey - Fits the screen to the current waveform",
+                    "default": "f"
+                },
+                "zoomTarget": {
+                    "type": "string",
+                    "description": "Zoom focus target (while using keyboard / buttons)",
+                    "default": "mouse"
+                },
+                "zoomAmount": {
+                    "type": "number",
+                    "description": "Zoom multiplier (while using keyboard / buttons)",
+                    "default": 100
+                }
+            },
+            "required": [
+                "reload",
+                "createGroup",
+                "addSignal",
+                "deleteSignal",
+                "prevEdge",
+                "nextEdge",
+                "prevSignal",
+                "nextSignal",
+                "moveSignalUp",
+                "moveSignalDown",
+                "selectAll",
+                "zoomStart",
+                "zoomEnd",
+                "zoomIn",
+                "zoomOut",
+                "zoomFit",
+                "zoomTarget",
+                "zoomAmount"
+            ],
+            "additionalProperties": false
+        },
+        "MouseConfig": {
+            "type": "object",
+            "properties": {
+                "smoothScrolling": {
+                    "type": "boolean",
+                    "description": "Enable Smooth-Scrolling while zooming and panning",
+                    "default": true
+                },
+                "reverseScrolling": {
+                    "type": "boolean",
+                    "description": "Invert scrolling behavior",
+                    "default": false
+                },
+                "zoomTarget": {
+                    "type": "string",
+                    "description": "Zoom focus target (while using mouse-wheel / trackpad)",
+                    "default": "mouse"
+                },
+                "zoomAmount": {
+                    "type": "number",
+                    "description": "Default sidebar width in px",
+                    "default": 1
+                }
+            },
+            "required": ["smoothScrolling", "reverseScrolling", "zoomTarget", "zoomAmount"],
+            "additionalProperties": false
+        },
+        "SidebarConfig": {
+            "type": "object",
+            "properties": {
+                "width": {
+                    "type": "number",
+                    "description": "Default sidebar width in px",
+                    "default": 280
+                }
+            },
+            "required": ["width"],
+            "additionalProperties": false
+        },
+        "ThemeConfig": {
+            "type": "object",
+            "properties": {
+                "currentTheme": {
+                    "type": "string",
+                    "description": "Default width at application startup"
+                },
+                "palette": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [
+                        "#ff1744",
+                        "#f50057",
+                        "#d500f9",
+                        "#651fff",
+                        "#3d5afe",
+                        "#2979ff",
+                        "#00b0ff",
+                        "#00e5ff",
+                        "#ff3d00",
+                        "#ff9100",
+                        "#ffc400",
+                        "#ffea00",
+                        "#c6ff00",
+                        "#76ff03",
+                        "#00e676",
+                        "#1de9b6"
+                    ]
+                }
+            },
+            "required": ["currentTheme", "palette"],
+            "additionalProperties": false
+        },
+        "WindowConfig": {
+            "type": "object",
+            "properties": {
+                "x": {
+                    "type": "number",
+                    "description": "Integer (optional) - (required if y is used) Window's left offset from screen. Default is to center the window.",
+                    "default": 800
+                },
+                "y": {
+                    "type": "number",
+                    "description": "Integer (optional) - (required if x is used) Window's top offset from screen. Default is to center the window.",
+                    "default": 800
+                },
+                "width": {
+                    "type": "number",
+                    "description": "Default width at application startup",
+                    "default": 800
+                },
+                "height": {
+                    "type": "number",
+                    "description": "Default height at application startup",
+                    "default": 600
+                }
+            },
+            "required": ["width", "height"],
+            "additionalProperties": false
+        }
+    }
+}
