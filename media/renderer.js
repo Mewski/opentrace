@@ -55,6 +55,16 @@
         vscode.postMessage({ type: 'config-save', detail: event.detail });
     });
 
+    app.addEventListener('state-changed', () => {
+        // @ts-ignore
+        app.export().then((result) => {
+            vscode.postMessage({ type: 'save-state', detail: result });
+        });
+    });
+
+
+	// Accumulator for chunked file loading
+	let _chunkBuffer = [];
 
 	// Handle messages from the extension
 	window.addEventListener('message', async e => {
@@ -68,9 +78,9 @@
                 app.fileChanged();
                 break;
 
-            case 'config': 
+            case 'config':
                 // @ts-ignore
-                app.loadConfig(JSON.parse(e.data.value)); 
+                app.loadConfig(JSON.parse(e.data.value));
                 break;
 
             case 'parse':
@@ -84,24 +94,47 @@
                     app.parse(e.data.value);
                 }
                 break;
-            
+
+            case 'parse-chunk':
+                _chunkBuffer.push(e.data.value);
+                break;
+
+            case 'parse-end': {
+                const fullData = _chunkBuffer.join('');
+                _chunkBuffer = [];
+                if (e.data.reload) {
+                    // @ts-ignore
+                    const saved = app.export();
+                    // @ts-ignore
+                    app.clear();
+                    // @ts-ignore
+                    app.parse(fullData);
+                    // @ts-ignore
+                    app.import(saved);
+                } else {
+                    // @ts-ignore
+                    app.parse(fullData);
+                }
+                break;
+            }
+
             case 'clear':
                 // @ts-ignore
                 app.clear();
                 break;
-            
+
             case 'export': {
                 // @ts-ignore
                 const temp = app.export();
                 vscode.postMessage({ type: 'export', value: temp});
-                break;      
-            }  
-            
+                break;
+            }
+
             case 'import': {
                 // @ts-ignore
                 app.import(e.data.value);
-                break;      
-            }  
+                break;
+            }
 
             case 'reload': {
                 // @ts-ignore
@@ -125,11 +158,29 @@
 
                 break;
             }
-            
-            case 'set-machine':
+
+            case 'get-state': {
                 // @ts-ignore
-                app.setMachine(JSON.parse(e.data.value));
+                app.export().then((result) => {
+                    vscode.postMessage({ type: 'save-state', detail: result });
+                });
                 break;
+            }
+
+            case 'restore-state': {
+                // @ts-ignore
+                app.import(e.data.value);
+                break;
+            }
+
+            case 'get-hierarchy': {
+                // @ts-ignore
+                app.getNodes().then((result) => {
+                    vscode.postMessage({ type: 'hierarchy', detail: result });
+                });
+                break;
+            }
+
 		}
 	});
 

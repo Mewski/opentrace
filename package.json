@@ -28,7 +28,40 @@
     ],
     "main": "./dist/extension.js",
     "contributes": {
-        "commands": [],
+        "commands": [
+            {
+                "command": "opentrace.signalTree.refresh",
+                "title": "Refresh Signal Hierarchy",
+                "category": "OpenTrace",
+                "icon": "$(refresh)"
+            }
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "opentrace",
+                    "title": "OpenTrace",
+                    "icon": "$(pulse)"
+                }
+            ]
+        },
+        "views": {
+            "opentrace": [
+                {
+                    "id": "opentrace.signalTree",
+                    "name": "Signal Hierarchy"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "opentrace.signalTree.refresh",
+                    "when": "view == opentrace.signalTree",
+                    "group": "navigation"
+                }
+            ]
+        },
         "customEditors": [
             {
                 "viewType": "opentrace.vcd",

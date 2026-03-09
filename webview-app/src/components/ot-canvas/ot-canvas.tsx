@@ -12,6 +12,7 @@ import {
 import * as PIXI from 'pixi.js';
 import { ZoomTarget } from '../../utils/types';
 import type { Signal, AppConfig, Viewport as ViewportData } from '../../utils/types';
+import { createWaveformRenderer, WaveformSprite } from './waveform-renderer';
 
 // ---------------------------------------------------------------------------
 // Viewport – manages pan / zoom state (replaces minified `du`)
@@ -108,23 +109,25 @@ class ViewportState {
 class CursorGraphics extends PIXI.Container {
   private gfx: PIXI.Graphics;
   offsetPs = 0;
+  private _color: number;
+  private _alpha: number;
 
-  constructor() {
+  constructor(color?: number, alpha?: number) {
     super();
     this.gfx = new PIXI.Graphics();
+    this._color = color ?? 0xffffff;
+    this._alpha = alpha ?? 1;
     this.addChild(this.gfx);
   }
 
   draw(viewport: ViewportState): void {
-    const raw = getComputedStyle(document.documentElement).getPropertyValue('--cursor').trim();
     const cursorWidth = parseInt(
       getComputedStyle(document.documentElement).getPropertyValue('--cursor-width').trim(),
     );
     this.gfx.clear();
 
     const xPos = Math.floor(this.offsetPs * viewport.xscale) - 1;
-    // Draw a vertical line at the cursor position.
-    this.gfx.lineStyle(cursorWidth, 0xffffff, 1, 0, false);
+    this.gfx.lineStyle(cursorWidth, this._color, this._alpha, 0, false);
     this.gfx.moveTo(xPos, 0.5);
     this.gfx.lineTo(xPos, (this.parent as PIXI.Container).height);
     this.gfx.lineTo(xPos, 0.5);
@@ -132,6 +135,11 @@ class CursorGraphics extends PIXI.Container {
 
   move(ps: number): void {
     this.offsetPs = ps;
+  }
+
+  setColor(color: number, alpha?: number): void {
+    this._color = color;
+    if (alpha !== undefined) this._alpha = alpha;
   }
 }
 
@@ -368,9 +376,16 @@ export class OtCanvas {
   private app!: PIXI.Application;
   private grid!: GridContainer;
   private cursor!: CursorGraphics;
+  private cursor2!: CursorGraphics;
+  private activeCursor: 1 | 2 = 1;
   private waveforms!: PIXI.Container;
   private graph!: PIXI.Container;
   private mask!: PIXI.Graphics;
+
+  // Box-select zoom state
+  private boxSelectActive: boolean = false;
+  private boxSelectStartX: number = 0;
+  private boxSelectOverlay!: PIXI.Graphics;
 
   // ------------------------------------------------------------ Lifecycle
 
@@ -379,9 +394,26 @@ export class OtCanvas {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', this.handleResize);
     window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', this.handleResize);
 
-    this.el.onpointerdown = (e: PointerEvent) => this.handleSetCursor(e.offsetX);
+    this.el.onpointerdown = (e: PointerEvent) => {
+      // Ctrl+click or middle-click starts box-select zoom
+      if (e.ctrlKey || e.button === 1) {
+        this.startBoxSelect(e.offsetX);
+        e.preventDefault();
+        return;
+      }
+      this.handleSetCursor(e.offsetX);
+    };
     this.el.onpointermove = (e: PointerEvent) => {
-      if (e.buttons) this.handleSetCursor(e.offsetX);
+      if (this.boxSelectActive) {
+        this.updateBoxSelect(e.offsetX);
+        return;
+      }
+      if (e.buttons & 1) this.handleSetCursor(e.offsetX);
+    };
+    this.el.onpointerup = (e: PointerEvent) => {
+      if (this.boxSelectActive) {
+        this.endBoxSelect(e.offsetX);
+      }
     };
 
     this.el.addEventListener(
@@ -441,21 +473,28 @@ export class OtCanvas {
     this.el.prepend(this.app.view as HTMLCanvasElement);
 
     this.grid = new GridContainer();
-    this.cursor = new CursorGraphics();
+    this.cursor = new CursorGraphics(0xffffff, 1);
+    this.cursor2 = new CursorGraphics(0x40c4ff, 0.7);
     this.waveforms = new PIXI.Container();
     this.graph = new PIXI.Container();
     this.graph.addChild(this.waveforms);
 
     this.mask = new PIXI.Graphics();
+    this.boxSelectOverlay = new PIXI.Graphics();
+    this.boxSelectOverlay.visible = false;
 
     this.app.stage.addChild(this.mask);
     this.app.stage.addChild(this.grid as any);
     this.app.stage.addChild(this.graph);
+    this.app.stage.addChild(this.cursor2 as any);
     this.app.stage.addChild(this.cursor as any);
+    this.app.stage.addChild(this.boxSelectOverlay);
 
     this.graph.mask = this.mask;
     (this.cursor as any).y = this.grid.style.axisHeight;
     (this.cursor as any).height = this.app.screen.height;
+    (this.cursor2 as any).y = this.grid.style.axisHeight;
+    (this.cursor2 as any).height = this.app.screen.height;
 
     this.resize();
     this.bindKeyboardShortcuts();
@@ -496,27 +535,32 @@ export class OtCanvas {
 
   /**
    * Create a PIXI display object for a single signal trace.
-   * Override / extend this to plug in custom waveform renderers.
+   * Uses the appropriate renderer based on signal type and display settings.
    */
-  private createWaveformSprite(signal: Signal): PIXI.Container {
-    const container = new PIXI.Container();
-    container.name = signal.vid;
-    return container;
+  private createWaveformSprite(signal: Signal): WaveformSprite {
+    return createWaveformRenderer(signal);
   }
 
   // -------------------------------------------------- Public API methods
 
-  /** Remove one or more signals by id. */
+  /** Rebind keyboard shortcuts after config change. */
   @Method()
-  async delete(...signals: Signal[]) {
-    for (const sig of signals) {
+  async input() {
+    this.bindKeyboardShortcuts();
+  }
+
+  /** Remove one or more signals by id. Accepts Signal objects or numeric ids. */
+  @Method()
+  async delete(...items: (Signal | number)[]) {
+    for (const item of items) {
       try {
-        const child = this.waveforms.getChildByName(sig.id.toString());
+        const id = typeof item === 'number' ? item : item.id;
+        const child = this.waveforms.getChildByName(id.toString());
         if (child) {
           const idx = this.waveforms.getChildIndex(child);
           this.waveforms.removeChildAt(idx);
         }
-        this._signalDict.delete(sig.id);
+        this._signalDict.delete(id);
       } catch (_) {
         // Ignore missing children.
       }
@@ -547,7 +591,8 @@ export class OtCanvas {
   async nextEdge() {
     if (!this.activeSignal || !waveformDb) return;
 
-    let [, idx] = waveformDb.get_trace_index(this.activeSignal.vid, this.cursor.offsetPs);
+    const cursorObj = this.activeCursor === 1 ? this.cursor : this.cursor2;
+    let [, idx] = waveformDb.get_trace_index(this.activeSignal.vid, cursorObj.offsetPs);
     if (idx < 0) return;
     idx += 1;
     if (idx >= waveformDb.get_trace_length(this.activeSignal.vid)) return;
@@ -570,7 +615,8 @@ export class OtCanvas {
   async prevEdge() {
     if (!this.activeSignal || !waveformDb) return;
 
-    let [, idx] = waveformDb.get_trace_index(this.activeSignal.vid, this.cursor.offsetPs);
+    const cursorObj = this.activeCursor === 1 ? this.cursor : this.cursor2;
+    let [, idx] = waveformDb.get_trace_index(this.activeSignal.vid, cursorObj.offsetPs);
     if (idx <= 0) return;
     idx -= 1;
 
@@ -592,6 +638,33 @@ export class OtCanvas {
     this.handleSetCursor();
   }
 
+  /** Toggle between primary and secondary cursor. */
+  @Method()
+  async toggleActiveCursor() {
+    this.activeCursor = this.activeCursor === 1 ? 2 : 1;
+    // Update cursor colors to show which is active
+    if (this.activeCursor === 1) {
+      this.cursor.setColor(0xffffff, 1);
+      this.cursor2.setColor(0x40c4ff, 0.7);
+    } else {
+      this.cursor.setColor(0xffffff, 0.7);
+      this.cursor2.setColor(0x40c4ff, 1);
+    }
+    this.draw();
+  }
+
+  /** Get the time delta between the two cursors. */
+  @Method()
+  async getCursorDelta(): Promise<number> {
+    return Math.abs(this.cursor.offsetPs - this.cursor2.offsetPs);
+  }
+
+  /** Get position of both cursors. */
+  @Method()
+  async getCursorPositions(): Promise<{ primary: number; secondary: number }> {
+    return { primary: this.cursor.offsetPs, secondary: this.cursor2.offsetPs };
+  }
+
   // -------------------------------------------------------- Drawing
 
   private draw(redrawWaveforms: boolean = false): void {
@@ -604,6 +677,7 @@ export class OtCanvas {
 
     this.graph.x = Math.ceil(-this.viewport.x * this.viewport.xscale);
     (this.cursor as any).x = this.graph.x;
+    (this.cursor2 as any).x = this.graph.x;
 
     for (const child of this.waveforms.children) {
       (child as any).draw?.(this.viewport, !redrawWaveforms);
@@ -611,6 +685,7 @@ export class OtCanvas {
 
     this.grid.draw(this.viewport, this.activeSignal);
     this.cursor.draw(this.viewport);
+    this.cursor2.draw(this.viewport);
     this.app.renderer.render(this.app.stage);
 
     // Push viewport state to the nav bar.
@@ -643,21 +718,27 @@ export class OtCanvas {
 
   // ---------------------------------------------------- Cursor logic
 
-  /** Move the cursor to a specific time and emit value changes. */
+  /** Move the active cursor to a specific time and emit value changes. */
   private moveCursor(time: number): void {
-    this.cursor.move(time);
+    const activeCursorObj = this.activeCursor === 1 ? this.cursor : this.cursor2;
+    activeCursorObj.move(time);
 
     // Update the nav bar marker.
     const nav = this.el.querySelector('#ot-canvas-nav-0') as any;
-    nav?.setPrimaryMarker?.((time / this.viewport.length) * 100);
+    if (this.activeCursor === 1) {
+      nav?.setPrimaryMarker?.((time / this.viewport.length) * 100);
+    } else {
+      nav?.setSecondaryMarker?.((time / this.viewport.length) * 100);
+    }
 
-    // Collect the value at the cursor for each waveform.
+    // Collect the value at the primary cursor for each waveform.
+    const primaryTime = this.cursor.offsetPs;
     const values: Record<string, string> = {};
     if (waveformDb) {
       for (const child of this.waveforms.children) {
         const wf = child as any;
         const vid = wf.config?.vid ?? wf.name;
-        const [traceIdx] = waveformDb.get_trace_index(vid, time);
+        const [traceIdx] = waveformDb.get_trace_index(vid, primaryTime);
         values[child.name] = waveformDb.get_trace_label(vid, traceIdx);
       }
     }
@@ -667,11 +748,12 @@ export class OtCanvas {
   }
 
   /**
-   * Snap the cursor to the nearest signal edge at the given screen x,
+   * Snap the active cursor to the nearest signal edge at the given screen x,
    * or re-evaluate at the current position when called with no argument.
    */
   private handleSetCursor(screenX?: number): void {
-    let ps = this.cursor.offsetPs;
+    const cursorObj = this.activeCursor === 1 ? this.cursor : this.cursor2;
+    let ps = cursorObj.offsetPs;
     if (screenX !== undefined) {
       ps = this.viewport.screenToPs(screenX);
     }
@@ -699,6 +781,56 @@ export class OtCanvas {
     if (minDist < Infinity) {
       this.moveCursor(snapTime);
     }
+  }
+
+  // --------------------------------------------------- Box-select zoom
+
+  private startBoxSelect(screenX: number): void {
+    this.boxSelectActive = true;
+    this.boxSelectStartX = screenX;
+    this.boxSelectOverlay.visible = true;
+    this.boxSelectOverlay.clear();
+  }
+
+  private updateBoxSelect(screenX: number): void {
+    if (!this.boxSelectActive) return;
+    const x1 = Math.min(this.boxSelectStartX, screenX);
+    const x2 = Math.max(this.boxSelectStartX, screenX);
+    const h = this.app.screen.height;
+
+    this.boxSelectOverlay.clear();
+    this.boxSelectOverlay.beginFill(0x448aff, 0.15);
+    this.boxSelectOverlay.lineStyle(1, 0x448aff, 0.6);
+    this.boxSelectOverlay.drawRect(x1, this.grid.style.axisHeight, x2 - x1, h - this.grid.style.axisHeight);
+    this.boxSelectOverlay.endFill();
+    this.app.renderer.render(this.app.stage);
+  }
+
+  private endBoxSelect(screenX: number): void {
+    this.boxSelectActive = false;
+    this.boxSelectOverlay.visible = false;
+    this.boxSelectOverlay.clear();
+
+    const x1 = Math.min(this.boxSelectStartX, screenX);
+    const x2 = Math.max(this.boxSelectStartX, screenX);
+
+    // Minimum drag distance to trigger zoom
+    if (x2 - x1 < 10) {
+      this.draw();
+      return;
+    }
+
+    // Convert screen coordinates to time
+    const t1 = this.viewport.screenToPs(x1);
+    const t2 = this.viewport.screenToPs(x2);
+    const timeRange = t2 - t1;
+
+    if (timeRange > 0) {
+      this.viewport.xscale = this.viewport.width / timeRange;
+      this.viewport.x = t1;
+    }
+
+    this.draw();
   }
 
   // ----------------------------------------------------- Resize
@@ -729,7 +861,9 @@ export class OtCanvas {
     this.viewport.resize(w, h);
     this.grid.reloadStyle(this.app.renderer);
     this.cursor.draw(this.viewport);
+    this.cursor2.draw(this.viewport);
     (this.cursor as any).height = h;
+    (this.cursor2 as any).height = h;
     this.graph.y = 0.5 - rect.y;
 
     // Remove waveform labels during resize (they get recreated on draw).
@@ -752,6 +886,11 @@ export class OtCanvas {
     unbindKey(cfg.zoomEnd);
     unbindKey(cfg.nextEdge);
     unbindKey(cfg.prevEdge);
+    unbindKey(cfg.toggleCursor);
+
+    bindKey(cfg.toggleCursor, () => {
+      this.toggleActiveCursor();
+    });
 
     bindKey(cfg.zoomFit, () => {
       this.viewport.fit();

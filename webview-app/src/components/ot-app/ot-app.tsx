@@ -9,7 +9,8 @@ import {
   Method,
 } from '@stencil/core';
 import { Signal, SignalType, Radix, AppConfig } from '../../utils/types';
-import { DEFAULT_CONFIG } from '../../utils/constants';
+import { DEFAULT_CONFIG, VERDI_KEYBOARD_CONFIG } from '../../utils/constants';
+import { UndoStack } from '../../utils/undoStack';
 
 // ---------------------------------------------------------------------------
 // External globals expected at runtime
@@ -43,6 +44,9 @@ export class OtApp {
   @Element() el!: HTMLElement;
 
   // ------------------------------------------------------------------ State
+
+  /** Undo/redo stack for signal operations. */
+  private _undoStack: UndoStack = new UndoStack();
 
   /** Map of signal id -> Signal for fast look-ups. */
   private _signalLookup: Map<number, Signal> = new Map();
@@ -81,6 +85,9 @@ export class OtApp {
 
   @Event({ eventName: 'config-reset', bubbles: true, composed: true })
   configReset!: EventEmitter<{}>;
+
+  @Event({ eventName: 'state-changed', bubbles: true, composed: true })
+  stateChanged!: EventEmitter<{}>;
 
   @Event({ eventName: 'config-reload', bubbles: true, composed: true })
   configReload!: EventEmitter<{}>;
@@ -196,6 +203,17 @@ export class OtApp {
   }
 
   /**
+   * Get hierarchy node data from the WASM parser.
+   */
+  @Method()
+  async getNodes(): Promise<string> {
+    if (vcd) {
+      return vcd.nodes();
+    }
+    return '[]';
+  }
+
+  /**
    * Clear the current VCD data and all signals.
    */
   @Method()
@@ -213,6 +231,12 @@ export class OtApp {
    */
   @Method()
   async loadConfig(config: AppConfig): Promise<void> {
+    if ((config as any).keyboardPreset === 'verdi') {
+      config = {
+        ...config,
+        keyboard: { ...config.keyboard, ...VERDI_KEYBOARD_CONFIG },
+      };
+    }
     appConfig = config;
 
     hotkeys.unbind(appConfig.keyboard.addSignal);
@@ -252,6 +276,21 @@ export class OtApp {
       this.sidebar().moveSelectedSignals(1);
     });
 
+    hotkeys.unbind(appConfig.keyboard.undo);
+    hotkeys(appConfig.keyboard.undo, () => {
+      this._undoStack.undo();
+    });
+
+    hotkeys.unbind(appConfig.keyboard.redo);
+    hotkeys(appConfig.keyboard.redo, () => {
+      this._undoStack.redo();
+    });
+
+    hotkeys.unbind(appConfig.keyboard.createGroup);
+    hotkeys(appConfig.keyboard.createGroup, () => {
+      this.createGroup();
+    });
+
     hotkeys.unbind(appConfig.keyboard.reload);
     hotkeys(appConfig.keyboard.reload, () => {
       this.fileReload.emit({});
@@ -279,12 +318,19 @@ export class OtApp {
   }
 
   /**
-   * Set machine info (WASM module metadata).
-   * All licensing logic has been removed – just stores the machine data.
+   * Undo the last signal operation.
    */
   @Method()
-  async setMachine(machine: any): Promise<void> {
-    vcd.machine = machine;
+  async undo(): Promise<void> {
+    this._undoStack.undo();
+  }
+
+  /**
+   * Redo a previously undone signal operation.
+   */
+  @Method()
+  async redo(): Promise<void> {
+    this._undoStack.redo();
   }
 
   // -------------------------------------------------------- Render
@@ -376,6 +422,50 @@ export class OtApp {
     this.deleteById(selected);
   }
 
+  /**
+   * Create a new signal group from the currently selected signals.
+   */
+  private createGroup(): void {
+    const selectedIds = this.sidebar().getSelected();
+    if (!selectedIds || selectedIds.length === 0) return;
+
+    // Collect selected signals
+    const groupChildren: Signal[] = [];
+    for (const id of selectedIds) {
+      const sig = this._signalLookup.get(id);
+      if (sig) {
+        groupChildren.push(JSON.parse(JSON.stringify(sig)));
+      }
+    }
+    if (groupChildren.length === 0) return;
+
+    // Remove selected from top-level
+    this.deleteById(selectedIds, false);
+
+    // Create group signal
+    const groupId = Date.now();
+    const group: Signal = {
+      id: groupId,
+      name: 'Group',
+      scope: '',
+      type: SignalType.group,
+      size: 0,
+      display: {
+        height: 24,
+        alias: 'New Group',
+        color: '#00e676',
+        fill: 0.2,
+        renderer: 'line',
+        radix: 'hex',
+        strokeWidth: 2,
+      },
+      children: groupChildren,
+    };
+
+    this.addSignals([group]);
+    this.stateChanged.emit({});
+  }
+
   private handleSidebarRedraw(detail: any): void {
     if (!this.canvas()) return;
     this.canvas().draw();
@@ -385,12 +475,24 @@ export class OtApp {
         this.sidebar().resize();
       });
     }
+    this.stateChanged.emit({});
   }
 
   /**
    * Remove signals by id – unwatch from VCD, restore in search, redraw.
    */
-  private deleteById(ids: number[]): void {
+  private deleteById(ids: number[], pushUndo: boolean = true): void {
+    // Capture deleted signals for undo before removal
+    const deletedSignals: Signal[] = [];
+    if (pushUndo) {
+      for (const id of ids) {
+        const sig = this._signalLookup.get(id);
+        if (sig) {
+          deletedSignals.push(JSON.parse(JSON.stringify(sig)));
+        }
+      }
+    }
+
     function removeFromTree(tree: Signal[], targetId: number): boolean {
       for (let i = 0; i < tree.length; ++i) {
         const node = tree[i];
@@ -426,6 +528,20 @@ export class OtApp {
       this.sidebar().resize();
     });
     this.search().updateSignalCount();
+
+    if (pushUndo && deletedSignals.length > 0) {
+      this._undoStack.push({
+        type: 'deleteSignals',
+        undo: () => {
+          this.addSignals(deletedSignals);
+        },
+        redo: () => {
+          this.deleteById(ids);
+        },
+      });
+    }
+
+    this.stateChanged.emit({});
   }
 
   private deleteAll(): void {
@@ -484,6 +600,21 @@ export class OtApp {
 
     this.search().updateSignalCount();
     this._signals = [...this._signals]; // trigger re-render
+
+    // Push undo action for signal addition
+    const signalsCopy = JSON.parse(JSON.stringify(signals)) as Signal[];
+    this._undoStack.push({
+      type: 'addSignals',
+      undo: () => {
+        this.deleteById(addedIds);
+      },
+      redo: () => {
+        this.addSignals(signalsCopy);
+      },
+    });
+
+    this.stateChanged.emit({});
+
     return addedIds;
   }
 
@@ -500,6 +631,7 @@ export class OtApp {
       sig.display = detail;
     }
     this._signals = [...this._signals]; // trigger re-render
+    this.stateChanged.emit({});
   }
 
   // ----------------------------------------------------- Child accessors

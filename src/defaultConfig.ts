@@ -1,4 +1,5 @@
 export interface OpenTraceConfig {
+    keyboardPreset: 'default' | 'verdi';
     display: {
         disableGpu: boolean;
         antialias: boolean;
@@ -24,6 +25,9 @@ export interface OpenTraceConfig {
         moveSignalUp: string;
         moveSignalDown: string;
         selectAll: string;
+        undo: string;
+        redo: string;
+        toggleCursor: string;
         zoomStart: string;
         zoomEnd: string;
         zoomIn: string;
@@ -44,15 +48,22 @@ export interface OpenTraceConfig {
     theme: {
         palette: string[];
     };
-    window: {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    };
 }
 
+export const VERDI_KEYBOARD_CONFIG: Partial<OpenTraceConfig['keyboard']> = {
+    nextEdge: 'n',
+    prevEdge: 'shift+n',
+    zoomIn: 'z',
+    zoomOut: 'shift+z',
+    zoomFit: 'f',
+    zoomStart: 'home',
+    zoomEnd: 'end',
+    selectAll: 'ctrl+a',
+    deleteSignal: 'delete',
+};
+
 const defaultConfig: OpenTraceConfig = {
+    keyboardPreset: 'default',
     display: {
         disableGpu: false,
         antialias: false,
@@ -78,6 +89,9 @@ const defaultConfig: OpenTraceConfig = {
         moveSignalUp: 'ctrl+up',
         moveSignalDown: 'ctrl+down',
         selectAll: 'ctrl+a',
+        undo: 'ctrl+z',
+        redo: 'ctrl+shift+z',
+        toggleCursor: 'tab',
         zoomStart: 'home',
         zoomEnd: 'end',
         zoomIn: 'pageUp',
@@ -114,12 +128,6 @@ const defaultConfig: OpenTraceConfig = {
             '#00e676',
             '#1de9b6'
         ]
-    },
-    window: {
-        x: 800,
-        y: 800,
-        width: 800,
-        height: 600
     }
 };
 

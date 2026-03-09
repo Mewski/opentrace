@@ -118,6 +118,9 @@ export interface KeyboardConfig {
   moveSignalUp: string;
   moveSignalDown: string;
   selectAll: string;
+  undo: string;
+  redo: string;
+  toggleCursor: string;
   zoomStart: string;
   zoomEnd: string;
   zoomIn: string;
@@ -156,17 +159,6 @@ export interface ThemeConfig {
 }
 
 // ---------------------------------------------------------------------------
-// Window geometry (persisted)
-// ---------------------------------------------------------------------------
-
-export interface WindowConfig {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-// ---------------------------------------------------------------------------
 // Top-level application config  (was the minified global `ql`)
 // ---------------------------------------------------------------------------
 
@@ -180,7 +172,6 @@ export interface AppConfig {
   mouse: MouseConfig;
   sidebar: SidebarConfig;
   theme: ThemeConfig;
-  window: WindowConfig;
   [key: string]: unknown;
 }
 

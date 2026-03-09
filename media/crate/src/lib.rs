@@ -498,4 +498,119 @@ impl VCD {
     pub fn clear(&mut self) {
         self.reset();
     }
+
+    // -----------------------------------------------------------------------
+    // Bit-slicing methods
+    // -----------------------------------------------------------------------
+
+    /// Get a bit-sliced trace label for a signal.
+    /// `high` and `low` define the bit range [high:low] (inclusive).
+    /// Returns the formatted value of just those bits at the given trace index.
+    pub fn get_trace_label_slice(
+        &self,
+        tid: &str,
+        index: u32,
+        high: u32,
+        low: u32,
+    ) -> String {
+        let sig = match self.signals.get(tid) {
+            Some(s) => s,
+            None => return String::new(),
+        };
+        let idx = index as usize;
+        if idx >= sig.trace.len() {
+            return String::new();
+        }
+        format::format_label_slice(sig, idx, sig.radix, high, low)
+    }
+
+    /// Get the command (edge type) for a bit-sliced signal.
+    /// Extracts bits [high:low] from the signal value and computes the edge.
+    pub fn get_trace_cmd_slice(
+        &self,
+        tid: &str,
+        index: u32,
+        high: u32,
+        low: u32,
+    ) -> i32 {
+        let sig = match self.signals.get(tid) {
+            Some(s) => s,
+            None => return CMD_ZERO,
+        };
+        let idx = index as usize;
+        if idx >= sig.trace.len() {
+            return CMD_ZERO;
+        }
+
+        let slice_size = high.min(sig.size.saturating_sub(1)) - low.min(high) + 1;
+        let sliced = format::slice_bits(&sig.trace[idx].value, sig.size, high, low);
+
+        if slice_size == 1 {
+            // Single-bit slice: compute edge-aware command
+            let cur_val = match sliced.as_str() {
+                "0" => CMD_ZERO,
+                "1" => CMD_ONE,
+                "x" | "X" => CMD_INVALID,
+                "z" | "Z" => CMD_HIGHZ,
+                _ => CMD_ZERO,
+            };
+
+            if idx == 0 {
+                return cur_val;
+            }
+
+            let prev_sliced =
+                format::slice_bits(&sig.trace[idx - 1].value, sig.size, high, low);
+            match (prev_sliced.as_str(), sliced.as_str()) {
+                ("0", "1") => CMD_RISING,
+                ("1", "0") => CMD_FALLING,
+                (_, "x") | (_, "X") => CMD_INVALID,
+                (_, "z") | (_, "Z") => CMD_HIGHZ,
+                _ => cur_val,
+            }
+        } else {
+            // Multi-bit slice
+            if format::has_xz(&sliced) {
+                let xz = format::is_all_same_xz(&sliced);
+                if xz == Some('z') {
+                    CMD_HIGHZ
+                } else {
+                    CMD_INVALID
+                }
+            } else if idx > 0 {
+                let prev_sliced =
+                    format::slice_bits(&sig.trace[idx - 1].value, sig.size, high, low);
+                if prev_sliced != sliced {
+                    CMD_RISING
+                } else {
+                    CMD_ZERO
+                }
+            } else {
+                CMD_ZERO
+            }
+        }
+    }
+
+    /// Get trace data for a bit-sliced signal (used for bulk rendering).
+    /// Returns packed binary data: [time_u32_le, label_bytes, 0x00, ...] for each entry.
+    pub fn get_trace_data_slice(
+        &self,
+        tid: &str,
+        radix: u32,
+        high: u32,
+        low: u32,
+    ) -> Vec<u8> {
+        let sig = match self.signals.get(tid) {
+            Some(s) => s,
+            None => return Vec::new(),
+        };
+        let mut out = Vec::new();
+        for (i, entry) in sig.trace.iter().enumerate() {
+            out.extend_from_slice(&entry.time.to_le_bytes());
+            let label = format::format_label_slice(sig, i, radix, high, low);
+            out.extend_from_slice(label.as_bytes());
+            out.push(0);
+        }
+        out
+    }
 }

@@ -147,6 +147,18 @@
     --color-orange: #ffab40;
     --color-deepOrange: #ff6e40;
 
+    /* Waveform Colors */
+    --waveform-high: var(--vscode-charts-green, #00e676);
+    --waveform-low: var(--vscode-charts-green, #00e676);
+    --waveform-x: var(--vscode-charts-yellow, #ffc107);
+    --waveform-z: var(--vscode-charts-blue, #2196f3);
+    --waveform-bus-fill: var(--vscode-charts-green, #00e67633);
+    --waveform-bus-stroke: var(--vscode-charts-green, #00e676);
+    --waveform-analog: var(--vscode-charts-orange, #ff9800);
+    --waveform-text: var(--vscode-editor-foreground, #cccccc);
+    --waveform-rising: var(--vscode-charts-green, #00e676);
+    --waveform-falling: var(--vscode-charts-red, #ef5350);
+
     /* Settings */
     --settings-action-background: var(--background);
 }

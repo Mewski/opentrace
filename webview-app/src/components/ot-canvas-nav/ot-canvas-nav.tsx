@@ -104,6 +104,16 @@ export class OtCanvasNav {
     }
   }
 
+  /** Position the secondary cursor marker at the given percentage (0-100). */
+  @Method()
+  async setSecondaryMarker(pct: number) {
+    const marker = this.el.shadowRoot?.getElementById('nav-secondary-marker');
+    if (marker) {
+      marker.style.left = `${pct}%`;
+      marker.style.display = 'block';
+    }
+  }
+
   // -------------------------------------------------------- Internal logic
 
   @Watch('_viewport')
@@ -218,6 +228,7 @@ export class OtCanvasNav {
 
         <div id="nav-bar" onPointerMove={this.handlePointerMove} onPointerDown={this.handlePointerMove}>
           <div id="nav-primary-marker"></div>
+          <div id="nav-secondary-marker" style={{ display: 'none' }}></div>
           <div id="nav-slider"></div>
         </div>
 

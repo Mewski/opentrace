@@ -108,6 +108,5 @@ suite('Schema file', () => {
         assert.ok('MouseConfig' in defs);
         assert.ok('SidebarConfig' in defs);
         assert.ok('ThemeConfig' in defs);
-        assert.ok('WindowConfig' in defs);
     });
 });

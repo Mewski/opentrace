@@ -9,16 +9,43 @@ function escapeAttribute(value: vscode.Uri | string): string {
     return value.toString().replace(/"/g, '&quot;');
 }
 
+function simpleHash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(16);
+}
+
 export class VCDManager implements vscode.CustomReadonlyEditorProvider {
     public static readonly viewType = 'opentrace.vcd';
 
     private readonly _vcds = new Set<VCDEditor>();
     private _activeVCD: VCDEditor | undefined;
 
+    private readonly _onDidChangeHierarchy = new vscode.EventEmitter<any[]>();
+    public readonly onDidChangeHierarchy = this._onDidChangeHierarchy.event;
+
+    private _activeHierarchy: any[] | undefined;
+
     constructor(
         private readonly extensionRoot: vscode.Uri,
         private readonly globalStoragePath: string
     ) {}
+
+    public get activeHierarchy(): any[] | undefined {
+        return this._activeHierarchy;
+    }
+
+    /**
+     * Called by a VCDEditor when it receives hierarchy data from the webview.
+     */
+    public setHierarchy(nodes: any[]): void {
+        this._activeHierarchy = nodes;
+        this._onDidChangeHierarchy.fire(nodes);
+    }
 
     public async openCustomDocument(uri: vscode.Uri): Promise<vscode.CustomDocument> {
         return { uri, dispose: () => {} };
@@ -29,6 +56,7 @@ export class VCDManager implements vscode.CustomReadonlyEditorProvider {
         webviewEditor: vscode.WebviewPanel
     ): Promise<void> {
         const editor = new VCDEditor(
+            this,
             this.extensionRoot,
             this.globalStoragePath,
             document.uri,
@@ -36,8 +64,21 @@ export class VCDManager implements vscode.CustomReadonlyEditorProvider {
         );
         this._vcds.add(editor);
         this.setActiveVCD(editor);
+        webviewEditor.onDidChangeViewState(() => {
+            if (webviewEditor.active) {
+                this.setActiveVCD(editor);
+                if (editor.hierarchy) {
+                    this.setHierarchy(editor.hierarchy);
+                }
+            }
+        });
         webviewEditor.onDidDispose(() => {
             this._vcds.delete(editor);
+            if (this._activeVCD === editor) {
+                this._activeVCD = undefined;
+                this._activeHierarchy = undefined;
+                this._onDidChangeHierarchy.fire([]);
+            }
         });
     }
 
@@ -66,7 +107,14 @@ class VCDEditor extends Disposable {
     private readonly configPath: vscode.Uri;
     private config: OpenTraceConfig | null = null;
 
+    private _hierarchy: any[] | undefined;
+
+    public get hierarchy(): any[] | undefined {
+        return this._hierarchy;
+    }
+
     constructor(
+        private readonly manager: VCDManager,
         private readonly extensionRoot: vscode.Uri,
         private readonly globalStoragePath: string,
         private readonly resource: vscode.Uri,
@@ -103,26 +151,54 @@ class VCDEditor extends Disposable {
                             type: 'config',
                             value: JSON.stringify(this.config)
                         });
-                        await this.webviewEditor.webview.postMessage({
-                            type: 'parse',
-                            value: await this.read()
-                        });
+                        await this.readChunked();
                         break;
                     }
 
                     case 'done': {
                         statusMessage.dispose();
                         statusMessage = vscode.window.setStatusBarMessage('Done', 2000);
+
+                        // Request hierarchy from webview
+                        this.webviewEditor.webview.postMessage({ type: 'get-hierarchy' });
+
+                        // Request state from webview for saving
+                        this.webviewEditor.webview.postMessage({ type: 'get-state' });
+
+                        // Restore per-file state if available
+                        const savedState = this.loadPerFileState();
+                        if (savedState) {
+                            this.webviewEditor.webview.postMessage({
+                                type: 'restore-state',
+                                value: savedState
+                            });
+                            this._log.appendLine('[INFO] Restored per-file state');
+                        }
                         break;
+                    }
+
+                    case 'hierarchy': {
+                        try {
+                            const nodes = typeof message.detail === 'string'
+                                ? JSON.parse(message.detail)
+                                : message.detail;
+                            this._hierarchy = nodes;
+                            this.manager.setHierarchy(nodes);
+                        } catch (e) {
+                            this._log.appendLine('[ERROR] Failed to parse hierarchy: ' + e);
+                        }
+                        return;
+                    }
+
+                    case 'save-state': {
+                        this.savePerFileState(message.detail);
+                        return;
                     }
 
                     case 'reload': {
                         statusMessage.dispose();
                         statusMessage = vscode.window.setStatusBarMessage('Reloading waveform...');
-                        this.webviewEditor.webview.postMessage({
-                            type: 'reload',
-                            value: await this.read()
-                        });
+                        await this.readChunked(true);
                         break;
                     }
 
@@ -241,6 +317,9 @@ class VCDEditor extends Disposable {
         return p.endsWith('.fst') || p.endsWith('.ghw');
     }
 
+    private static readonly CHUNK_SIZE = 4 * 1024 * 1024; // 4MB
+    private static readonly CHUNK_THRESHOLD = 4 * 1024 * 1024; // 4MB
+
     private async read(): Promise<string | Uint8Array> {
         this._log.appendLine('[INFO] Reading ' + this.resource.path);
         const data = await vscode.workspace.fs.readFile(this.resource);
@@ -248,6 +327,64 @@ class VCDEditor extends Disposable {
             return data;
         }
         return new TextDecoder('utf-8').decode(data);
+    }
+
+    /**
+     * Read the file and send it to the webview in chunks if it is a large VCD
+     * text file (>4MB). Binary formats and small files fall back to a single
+     * `parse` message for backward compatibility.
+     */
+    private async readChunked(isReload: boolean = false): Promise<void> {
+        this._log.appendLine('[INFO] Reading (chunked) ' + this.resource.path);
+        const data = await vscode.workspace.fs.readFile(this.resource);
+
+        // Binary formats or small text files: send in one message
+        if (this.isBinaryFormat() || data.byteLength <= VCDEditor.CHUNK_THRESHOLD) {
+            const value = this.isBinaryFormat()
+                ? data
+                : new TextDecoder('utf-8').decode(data);
+            const type = isReload ? 'reload' : 'parse';
+            await this.webviewEditor.webview.postMessage({ type, value });
+            return;
+        }
+
+        const totalSize = data.byteLength;
+        const chunkSize = VCDEditor.CHUNK_SIZE;
+        const totalChunks = Math.ceil(totalSize / chunkSize);
+
+        this._log.appendLine(`[INFO] Sending ${totalChunks} chunks (${totalSize} bytes)`);
+
+        await vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: 'Loading waveform',
+                cancellable: false
+            },
+            async (progress) => {
+                for (let i = 0; i < totalChunks; i++) {
+                    const start = i * chunkSize;
+                    const end = Math.min(start + chunkSize, totalSize);
+                    const chunk = data.slice(start, end);
+                    const text = new TextDecoder('utf-8').decode(chunk);
+
+                    await this.webviewEditor.webview.postMessage({
+                        type: 'parse-chunk',
+                        value: text
+                    });
+
+                    const percent = Math.round(((i + 1) / totalChunks) * 100);
+                    progress.report({
+                        increment: (1 / totalChunks) * 100,
+                        message: `${percent}%`
+                    });
+                }
+
+                await this.webviewEditor.webview.postMessage({
+                    type: 'parse-end',
+                    reload: isReload
+                });
+            }
+        );
     }
 
     private async getWebviewContents(): Promise<string> {
@@ -312,5 +449,33 @@ class VCDEditor extends Disposable {
 
     private storeConfig(): void {
         fs.writeFileSync(this.configPath.fsPath, JSON.stringify(this.config, null, 4), 'utf8');
+    }
+
+    private getPerFileConfigPath(): string {
+        const hash = simpleHash(this.resource.toString());
+        return path.join(this.globalStoragePath, `${hash}.json`);
+    }
+
+    private savePerFileState(state: any): void {
+        const filePath = this.getPerFileConfigPath();
+        try {
+            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+            fs.writeFileSync(filePath, JSON.stringify(state, null, 2), 'utf8');
+        } catch (e) {
+            this._log.appendLine('[ERROR] Could not save per-file state: ' + e);
+        }
+    }
+
+    private loadPerFileState(): any | null {
+        const filePath = this.getPerFileConfigPath();
+        try {
+            if (fs.existsSync(filePath)) {
+                const data = fs.readFileSync(filePath, 'utf8');
+                return JSON.parse(data);
+            }
+        } catch (e) {
+            this._log.appendLine('[ERROR] Could not load per-file state: ' + e);
+        }
+        return null;
     }
 }

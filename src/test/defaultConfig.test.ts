@@ -8,7 +8,6 @@ suite('defaultConfig', () => {
         assert.ok(defaultConfig.mouse);
         assert.ok(defaultConfig.sidebar);
         assert.ok(defaultConfig.theme);
-        assert.ok(defaultConfig.window);
     });
 
     test('display.defaultTraceStyle has valid renderer and color', () => {
@@ -57,11 +56,6 @@ suite('defaultConfig', () => {
         }
     });
 
-    test('window dimensions are positive', () => {
-        assert.ok(defaultConfig.window.width > 0);
-        assert.ok(defaultConfig.window.height > 0);
-    });
-
     test('config is safely serializable (JSON round-trip)', () => {
         const clone = JSON.parse(JSON.stringify(defaultConfig)) as OpenTraceConfig;
         assert.deepStrictEqual(clone.display, defaultConfig.display);
@@ -69,7 +63,6 @@ suite('defaultConfig', () => {
         assert.deepStrictEqual(clone.mouse, defaultConfig.mouse);
         assert.deepStrictEqual(clone.sidebar, defaultConfig.sidebar);
         assert.deepStrictEqual(clone.theme, defaultConfig.theme);
-        assert.deepStrictEqual(clone.window, defaultConfig.window);
     });
 
     test('config can be merged with partial overrides', () => {

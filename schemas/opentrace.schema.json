@@ -5,6 +5,12 @@
         "Config": {
             "type": "object",
             "properties": {
+                "keyboardPreset": {
+                    "type": "string",
+                    "enum": ["default", "verdi"],
+                    "description": "Keyboard shortcut preset. Use 'verdi' for Verdi/EDA-standard keybindings.",
+                    "default": "default"
+                },
                 "display": {
                     "$ref": "#/definitions/DisplayConfig",
                     "description": "Display Configuration"
@@ -24,13 +30,9 @@
                 "theme": {
                     "$ref": "#/definitions/ThemeConfig",
                     "description": "Theme Configuration"
-                },
-                "window": {
-                    "$ref": "#/definitions/WindowConfig",
-                    "description": "Window Configuration"
                 }
             },
-            "required": ["display", "keyboard", "mouse", "sidebar", "theme", "window"],
+            "required": ["display", "keyboard", "mouse", "sidebar", "theme"],
             "additionalProperties": false,
             "description": "Config"
         },
@@ -175,6 +177,21 @@
                     "description": "Hotkey - Select all active signals",
                     "default": "ctrl+a"
                 },
+                "undo": {
+                    "type": "string",
+                    "description": "Hotkey - Undo last signal operation",
+                    "default": "ctrl+z"
+                },
+                "redo": {
+                    "type": "string",
+                    "description": "Hotkey - Redo last undone signal operation",
+                    "default": "ctrl+shift+z"
+                },
+                "toggleCursor": {
+                    "type": "string",
+                    "description": "Hotkey - Toggle between primary and secondary cursor",
+                    "default": "tab"
+                },
                 "zoomStart": {
                     "type": "string",
                     "description": "Hotkey - Scroll to the beginning of the file",
@@ -305,33 +322,6 @@
                 }
             },
             "required": ["currentTheme", "palette"],
-            "additionalProperties": false
-        },
-        "WindowConfig": {
-            "type": "object",
-            "properties": {
-                "x": {
-                    "type": "number",
-                    "description": "Integer (optional) - (required if y is used) Window's left offset from screen. Default is to center the window.",
-                    "default": 800
-                },
-                "y": {
-                    "type": "number",
-                    "description": "Integer (optional) - (required if x is used) Window's top offset from screen. Default is to center the window.",
-                    "default": 800
-                },
-                "width": {
-                    "type": "number",
-                    "description": "Default width at application startup",
-                    "default": 800
-                },
-                "height": {
-                    "type": "number",
-                    "description": "Default height at application startup",
-                    "default": 600
-                }
-            },
-            "required": ["width", "height"],
             "additionalProperties": false
         }
     }

@@ -64,6 +64,16 @@
   font-family: var(--font-monospace-family);
 }
 
+#nav-secondary-marker {
+  pointer-events: none;
+  position: relative;
+  top: calc(-100%);
+  left: 0%;
+  border-left: 2px solid #40c4ff;
+  height: calc(100%);
+  opacity: 0.7;
+}
+
 #zoom-group,
 #reload-group {
   flex-flow: row nowrap;

@@ -66,14 +66,10 @@ export class OtWindow {
     this.visible = true;
   }
 
-  /** Hide the window and deselect any machine-list entries. */
+  /** Hide the window. */
   @Method()
   async hide(): Promise<void> {
     this.visible = false;
-    // Clear any selected machine entries (legacy from settings panels)
-    this.el.shadowRoot!.querySelectorAll('#machine-list li .machine').forEach((el) => {
-      el.classList.remove('selected');
-    });
   }
 
   // -------------------------------------------------------- Render

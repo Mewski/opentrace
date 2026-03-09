@@ -43,6 +43,9 @@ export const DEFAULT_CONFIG: AppConfig = {
     moveSignalUp: 'ctrl+up',
     moveSignalDown: 'ctrl+down',
     selectAll: 'ctrl+a',
+    undo: 'ctrl+z',
+    redo: 'ctrl+shift+z',
+    toggleCursor: 'tab',
     zoomStart: 'home',
     zoomEnd: 'end',
     zoomIn: 'pageUp',
@@ -80,12 +83,22 @@ export const DEFAULT_CONFIG: AppConfig = {
       '#1de9b6',
     ],
   },
-  window: {
-    x: 800,
-    y: 800,
-    width: 800,
-    height: 600,
-  },
+};
+
+// ---------------------------------------------------------------------------
+// Verdi-style EDA keybinding overrides
+// ---------------------------------------------------------------------------
+
+export const VERDI_KEYBOARD_CONFIG: Partial<AppConfig['keyboard']> = {
+  nextEdge: 'n',
+  prevEdge: 'shift+n',
+  zoomIn: 'z',
+  zoomOut: 'shift+z',
+  zoomFit: 'f',
+  zoomStart: 'home',
+  zoomEnd: 'end',
+  selectAll: 'ctrl+a',
+  deleteSignal: 'delete',
 };
 
 // ---------------------------------------------------------------------------

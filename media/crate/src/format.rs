@@ -46,6 +46,98 @@ pub(crate) fn json_escape(s: &str) -> String {
     out
 }
 
+/// Extract bits [high:low] from a binary string value.
+/// Returns the sliced binary string.
+pub(crate) fn slice_bits(value: &str, size: u32, high: u32, low: u32) -> String {
+    // Clamp high to size - 1
+    let high = if size > 0 { high.min(size - 1) } else { 0 };
+    let low = low.min(high);
+
+    let chars: Vec<char> = value.chars().collect();
+    let vlen = chars.len() as u32;
+
+    // Pad value on the left with '0' if shorter than size
+    // MSB is index 0 in the string.
+    // Bit N corresponds to string index (size - 1 - N) from the right,
+    // i.e. string index (vlen - 1 - N) if vlen == size.
+    // With padding: bit N is at padded index (size - 1 - N).
+    // We want bits [high:low], which maps to padded indices [(size-1-low), (size-1-high)].
+    let pad_start = (size - 1 - high) as usize; // start index in padded string
+    let pad_end = (size - 1 - low) as usize;     // end index (inclusive)
+    let slice_len = (high - low + 1) as usize;
+
+    let mut result = String::with_capacity(slice_len);
+    for i in pad_start..=pad_end {
+        if i < (size - vlen) as usize {
+            // This position is in the zero-padding region
+            result.push('0');
+        } else {
+            let char_idx = i - (size - vlen) as usize;
+            result.push(chars[char_idx]);
+        }
+    }
+
+    result
+}
+
+/// Format a label for a sliced signal value.
+pub(crate) fn format_label_slice(
+    sig: &Signal,
+    idx: usize,
+    radix: u32,
+    high: u32,
+    low: u32,
+) -> String {
+    if idx >= sig.trace.len() {
+        return String::new();
+    }
+    let entry = &sig.trace[idx];
+    let val = &entry.value;
+    let slice_size = high.min(sig.size.saturating_sub(1)) - low.min(high) + 1;
+
+    // Real signals: fall back to normal formatting (slicing doesn't apply)
+    if sig.kind == "real" {
+        return format_label(sig, idx, radix);
+    }
+
+    let sliced = slice_bits(val, sig.size, high, low);
+
+    // Single-bit slice
+    if slice_size == 1 {
+        return match sliced.as_str() {
+            "0" => "0".to_string(),
+            "1" => "1".to_string(),
+            "x" | "X" => "x".to_string(),
+            "z" | "Z" => "z".to_string(),
+            _ => sliced,
+        };
+    }
+
+    let bin = sliced.as_str();
+
+    if has_xz(bin) {
+        if radix == Radix::Bin as u32 {
+            return bin.to_string();
+        }
+        if let Some(c) = is_all_same_xz(bin) {
+            return c.to_string();
+        }
+        return bin.to_string();
+    }
+
+    match radix {
+        r if r == Radix::Bin as u32 => bin.to_string(),
+        r if r == Radix::Oct as u32 => binary_to_octal(bin),
+        r if r == Radix::Hex as u32 => binary_to_hex(bin),
+        r if r == Radix::Unsigned as u32 => binary_to_decimal(bin),
+        r if r == Radix::Float as u32 => binary_to_decimal(bin),
+        r if r == Radix::Signed as u32 => binary_to_signed_decimal(bin, slice_size),
+        r if r == Radix::ASCII as u32 => binary_to_ascii(bin),
+        r if r == Radix::UTF8 as u32 => binary_to_ascii(bin),
+        _ => bin.to_string(),
+    }
+}
+
 pub(crate) fn format_label(sig: &Signal, idx: usize, radix: u32) -> String {
     if idx >= sig.trace.len() {
         return String::new();
