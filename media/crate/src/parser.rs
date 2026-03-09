@@ -17,7 +17,6 @@ pub(crate) fn parse_vcd(input: &str, vcd: &mut crate::VCD) -> bool {
 
     let mut current_time: u32 = 0;
     let mut scope_stack: Vec<i32> = Vec::new();
-    let mut in_dumpvars = false;
     let mut found_enddefinitions = false;
 
     // Tokenize: split on whitespace
@@ -109,7 +108,7 @@ pub(crate) fn parse_vcd(input: &str, vcd: &mut crate::VCD) -> bool {
             "$scope" => {
                 // $scope <type> <name> $end
                 i += 1;
-                let _scope_type = if i < tokens.len() {
+                let scope_type = if i < tokens.len() {
                     let t = tokens[i].clone();
                     i += 1;
                     t
@@ -169,7 +168,7 @@ pub(crate) fn parse_vcd(input: &str, vcd: &mut crate::VCD) -> bool {
                     children_uids: Vec::new(),
                     is_signal: false,
                     tid: String::new(),
-                    kind: String::new(),
+                    kind: scope_type,
                     size: 0,
                 });
 
@@ -281,27 +280,13 @@ pub(crate) fn parse_vcd(input: &str, vcd: &mut crate::VCD) -> bool {
                 }
             }
             "$dumpvars" => {
-                in_dumpvars = true;
                 i += 1;
             }
             "$end" => {
-                if in_dumpvars {
-                    in_dumpvars = false;
-                }
                 i += 1;
             }
             _ if !found_enddefinitions => {
                 // Skip unknown tokens in header
-                i += 1;
-            }
-            _ if token.starts_with('#') => {
-                // Timestamp
-                if let Ok(t) = token[1..].parse::<u32>() {
-                    current_time = t;
-                    if t > vcd.time {
-                        vcd.time = t;
-                    }
-                }
                 i += 1;
             }
             _ if token.starts_with('b') || token.starts_with('B') => {

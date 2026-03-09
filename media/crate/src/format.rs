@@ -7,10 +7,21 @@ pub(crate) fn has_xz(s: &str) -> bool {
 }
 
 pub(crate) fn is_all_same_xz(s: &str) -> Option<char> {
-    let lower: String = s.to_lowercase();
-    if lower.chars().all(|c| c == 'x') {
+    if s.is_empty() {
+        return None;
+    }
+    let mut all_x = true;
+    let mut all_z = true;
+    for c in s.chars() {
+        match c {
+            'x' | 'X' => all_z = false,
+            'z' | 'Z' => all_x = false,
+            _ => return None,
+        }
+    }
+    if all_x {
         Some('x')
-    } else if lower.chars().all(|c| c == 'z') {
+    } else if all_z {
         Some('z')
     } else {
         None
@@ -36,6 +47,9 @@ pub(crate) fn json_escape(s: &str) -> String {
 }
 
 pub(crate) fn format_label(sig: &Signal, idx: usize, radix: u32) -> String {
+    if idx >= sig.trace.len() {
+        return String::new();
+    }
     let entry = &sig.trace[idx];
     let val = &entry.value;
 

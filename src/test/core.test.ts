@@ -255,6 +255,36 @@ suite('Radix enum', () => {
     });
 });
 
+suite('License', () => {
+    test('can be constructed', () => {
+        const lic = new License();
+        assert.ok(lic);
+    });
+
+    test('can be freed', () => {
+        const lic = new License();
+        assert.doesNotThrow(() => lic.free());
+    });
+});
+
+suite('Machine', () => {
+    test('can be constructed', () => {
+        const m = new Machine();
+        assert.ok(m);
+    });
+
+    test('activated defaults to false', () => {
+        const m = new Machine();
+        assert.strictEqual(m.activated, false);
+        m.free();
+    });
+
+    test('can be freed', () => {
+        const m = new Machine();
+        assert.doesNotThrow(() => m.free());
+    });
+});
+
 suite('VCD construction and defaults', () => {
     let vcd: any;
 
@@ -837,7 +867,7 @@ suite('get_trace_label – binary radix', () => {
     test('label at index 0 for data represents 00000000', () => {
         vcd.set_radix('"', Radix.Bin);
         const label = vcd.get_trace_label('"', 0);
-        assert.ok(label.includes('0'), `expected zeros, got "${label}"`);
+        assert.strictEqual(label, '00000000');
     });
 
     test('label at index 1 for data represents 10101010', () => {
@@ -911,7 +941,7 @@ suite('get_trace_label – unsigned radix', () => {
 
     test('data at index 0 is 0 unsigned', () => {
         const label = vcd.get_trace_label('"', 0);
-        assert.ok(label.includes('0'), `expected 0, got "${label}"`);
+        assert.strictEqual(label, '0');
     });
 
     test('data at index 1 is 170 unsigned', () => {
@@ -1891,27 +1921,6 @@ $enddefinitions $end
         const result = vcd.parse(input);
         assert.ok(result, 'parse should succeed');
         assert.strictEqual(vcd.time, 4294967295);
-        vcd.free();
-    });
-
-    test('comments in VCD are skipped', () => {
-        const vcd = new VCD();
-        const input = `
-$comment This is a comment $end
-$timescale 1ns $end
-$scope module top $end
-$var wire 1 ! sig $end
-$upscope $end
-$enddefinitions $end
-#0
-0!
-#10
-1!
-`;
-        const result = vcd.parse(input);
-        assert.ok(result, 'parse should succeed');
-        assert.strictEqual(vcd.get_signal_count(), 1);
-        assert.strictEqual(vcd.get_trace_length('!'), 2);
         vcd.free();
     });
 

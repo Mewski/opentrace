@@ -211,10 +211,11 @@ impl VCD {
     }
 
     #[wasm_bindgen(setter)]
-    pub fn set_timescale(&mut self, val: &str) {
+    pub fn set_timescale(&mut self, val: &str) -> bool {
         let (mult, unit) = parse_timescale_str(val);
         self.timescale_mult_val = mult;
         self.timescale_unit_val = unit;
+        true
     }
 
     // -----------------------------------------------------------------------
@@ -272,9 +273,10 @@ impl VCD {
             // Multi-bit: use a simple scheme
             let val = &entry.value;
             if format::has_xz(val) {
-                if format::is_all_same_xz(val) == Some('z') {
+                let xz = format::is_all_same_xz(val);
+                if xz == Some('z') {
                     CMD_HIGHZ
-                } else if format::is_all_same_xz(val) == Some('x') {
+                } else if xz == Some('x') {
                     CMD_INVALID
                 } else {
                     CMD_INVALID
