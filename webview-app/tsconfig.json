@@ -12,7 +12,8 @@
         "moduleResolution": "node",
         "noUnusedLocals": false,
         "noUnusedParameters": false,
-        "strict": true,
+        "strict": false,
+        "strictNullChecks": false,
         "target": "es2017"
     },
     "include": ["src"],

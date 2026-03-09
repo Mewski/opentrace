@@ -5,14 +5,22 @@ export const config: Config = {
     outputTargets: [
         {
             type: 'dist',
-            dir: '../media/dist'
-        },
-        {
-            type: 'www',
-            serviceWorker: null,
-            dir: 'www'
+            dir: '../media/build'
         }
     ],
     globalStyle: 'src/global/app.css',
-    buildEs5: false
+    buildEs5: false,
+    rollupPlugins: {
+        before: [
+            {
+                name: 'externalize-core',
+                resolveId(source: string) {
+                    if (source.includes('core.js')) {
+                        return { id: '../../core.js', external: true };
+                    }
+                    return null;
+                }
+            }
+        ]
+    }
 };

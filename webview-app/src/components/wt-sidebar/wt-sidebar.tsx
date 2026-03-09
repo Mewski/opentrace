@@ -55,6 +55,9 @@ export class WtSidebar {
   /** Emitted when signals are reordered, properties change, etc. */
   @Event() waveformChanged!: EventEmitter<void>;
 
+  /** Emitted when the sidebar layout changes and the canvas needs a redraw. */
+  @Event() redraw!: EventEmitter<{ resize?: boolean }>;
+
   /** Emitted to tell the canvas which signal to highlight. */
   @Event({ bubbles: true, composed: true }) setActiveSignal!: EventEmitter<number>;
 
@@ -407,7 +410,7 @@ export class WtSidebar {
       'wi-container': signal.type !== SignalType.group && signal.type !== SignalType.divider,
     };
 
-    const style = signal.type !== SignalType.group ? `height: ${signal.display.height}px` : '';
+    const style = signal.type !== SignalType.group ? { height: `${signal.display.height}px` } : {};
     const id = signal.type === SignalType.group ? `wg-${signal.id}` : `wi-${signal.id}`;
 
     return (

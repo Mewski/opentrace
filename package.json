@@ -48,9 +48,10 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "webpack --mode production",
+        "vscode:prepublish": "npm run build:webview && webpack --mode production",
         "compile": "webpack --mode development",
         "watch": "webpack --mode development --watch",
+        "build:webview": "cd webview-app && npm run build",
         "test-compile": "tsc -p ./",
         "lint": "eslint src --ext .ts",
         "lint:fix": "eslint src --ext .ts --fix",

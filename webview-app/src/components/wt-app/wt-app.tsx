@@ -105,7 +105,7 @@ export class WtApp {
     handle.addEventListener('mousedown', (e: MouseEvent) => this.sidebarResizeStart(e), false);
 
     // Dynamically import the WASM-based VCD parser
-    const coreModule = await import('./core.js' as any);
+    const coreModule = await import('../../core.js' as any);
     const init = await (coreModule as any).default();
     vcd = new init.VCD();
     this.vcdReady.emit();
@@ -153,7 +153,7 @@ export class WtApp {
     const signals: Signal[] = JSON.parse(json);
     const ids = this.addSignals(signals);
     await this.search().updateComplete;
-    this.search().disable(ids);
+    this.search().markDisabled(ids);
   }
 
   /**
@@ -278,7 +278,7 @@ export class WtApp {
         <main id="main-0">
           <wt-canvas
             id="wt-canvas-0"
-            signalDict={this._signalLookup}
+            signals={this._signalLookup}
             onSetCursor={(e: CustomEvent) => this.sidebar().updateCursor(e.detail)}
             onSettings={() => this.showSettings()}
           />

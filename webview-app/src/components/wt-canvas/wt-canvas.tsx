@@ -10,79 +10,14 @@ import {
   Method,
 } from '@stencil/core';
 import * as PIXI from 'pixi.js';
-import type { Viewport as ViewportData } from '../wt-canvas-nav/wt-canvas-nav';
-
-// ---------------------------------------------------------------------------
-// Zoom-target enum (replaces minified `hu`)
-// ---------------------------------------------------------------------------
-
-export enum ZoomTarget {
-  Mouse = 'mouse',
-  Cursor = 'cursor',
-  Center = 'center',
-}
-
-// ---------------------------------------------------------------------------
-// Signal display metadata
-// ---------------------------------------------------------------------------
-
-export interface SignalDisplay {
-  y: number;
-  height: number;
-  color?: string;
-  alias?: string;
-  [key: string]: any;
-}
-
-export interface Signal {
-  id: number;
-  vid: string;
-  name: string;
-  scope: string;
-  size: number;
-  type: number;
-  children: Signal[];
-  display: SignalDisplay;
-}
-
-// ---------------------------------------------------------------------------
-// AppConfig – keyboard / mouse / display settings (replaces minified `ql`)
-// ---------------------------------------------------------------------------
-
-export interface MouseConfig {
-  zoomAmount: number;
-  zoomTarget: ZoomTarget;
-  reverseScrolling: boolean;
-}
-
-export interface KeyboardConfig {
-  zoomAmount: number;
-  zoomTarget: ZoomTarget;
-  zoomFit: string;
-  zoomStart: string;
-  zoomIn: string;
-  zoomOut: string;
-  zoomEnd: string;
-  nextEdge: string;
-  prevEdge: string;
-}
-
-export interface DisplayConfig {
-  antialias: boolean;
-  disableGpu: boolean;
-}
-
-export interface AppConfig {
-  mouse: MouseConfig;
-  keyboard: KeyboardConfig;
-  display: DisplayConfig;
-}
+import { ZoomTarget } from '../../utils/types';
+import type { Signal, AppConfig, Viewport as ViewportData } from '../../utils/types';
 
 // ---------------------------------------------------------------------------
 // Viewport – manages pan / zoom state (replaces minified `du`)
 // ---------------------------------------------------------------------------
 
-export class ViewportState {
+class ViewportState {
   x = 0;
   y = 0;
   width = 1;
@@ -423,6 +358,9 @@ export class WtCanvas {
   @Event({ eventName: 'setCursor', bubbles: true, composed: true })
   setCursorEvent!: EventEmitter<Record<string, string>>;
 
+  /** Emitted when the user requests the settings panel. */
+  @Event({ bubbles: true, composed: true }) settings!: EventEmitter<void>;
+
   // --------------------------------------------------------------- Internals
   private _signalDict: Map<number, Signal> = new Map();
   viewport: ViewportState = new ViewportState();
@@ -530,7 +468,6 @@ export class WtCanvas {
       <wt-canvas-nav
         id="wt-canvas-nav-0"
         fileChanged={this.fileChanged}
-        viewport={this.viewport.get()}
         onChange={(e: CustomEvent) => this.updateViewport(e)}
       />
     );

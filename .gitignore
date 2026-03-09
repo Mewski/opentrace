@@ -3,3 +3,6 @@ dist/
 .vscode-test/
 *.vsix
 .claude/
+webview-app/node_modules/
+webview-app/www/
+media/build/

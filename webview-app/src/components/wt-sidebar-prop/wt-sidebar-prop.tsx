@@ -41,7 +41,7 @@ export class WtSidebarProp {
 
   // -------------------------------------------------------- Internal logic
 
-  private handleColor = (evt: CustomEvent<{ color: string; fill: string | number }>) => {
+  private handleColor = (evt: CustomEvent<{ color: string; fill: number }>) => {
     this.options.color = evt.detail.color;
     this.options.fill = evt.detail.fill;
     this.dispatchUpdate();
@@ -99,7 +99,7 @@ export class WtSidebarProp {
           id="picker0"
           onChange={this.handleColor}
           color={this.options.color}
-          fill={this.options.fill}
+          fill={typeof this.options.fill === 'number' ? this.options.fill : parseFloat(this.options.fill as string) || 0}
         />
       </div>,
 

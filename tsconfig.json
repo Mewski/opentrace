@@ -15,5 +15,5 @@
         "esModuleInterop": true,
         "resolveJsonModule": true
     },
-    "exclude": ["node_modules", ".vscode-test", "dist", "bins"]
+    "exclude": ["node_modules", ".vscode-test", "dist", "bins", "webview-app"]
 }

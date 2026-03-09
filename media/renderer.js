@@ -55,23 +55,6 @@
         vscode.postMessage({ type: 'config-save', detail: event.detail });
     });
 
-    app.addEventListener('license', (event) => {
-        const data = JSON.parse(event.detail);
-        switch(data.action) {
-            case 'activate': {
-                vscode.postMessage({ type: 'license-activate', license: data.license, key: data.key });
-                break;
-            }
-            case 'set-key': {
-                vscode.postMessage({ type: 'license-set-key', key: data.key });
-                break;
-            }
-            case 'deactivate': {
-                vscode.postMessage({ type: 'license-deactivate' }); 
-                break;
-            }
-        }     
-    });
 
 	// Handle messages from the extension
 	window.addEventListener('message', async e => {
@@ -131,8 +114,7 @@
             
             case 'set-machine':
                 // @ts-ignore
-                const data = JSON.parse(e.data.value);
-                app.setMachine(data.machine, data.license);
+                app.setMachine(JSON.parse(e.data.value));
                 break;
 		}
 	});

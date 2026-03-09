@@ -7,7 +7,7 @@ import { SIGNAL_ICONS, getSignalIconKey } from '../../utils/icons';
  * Descriptor for a signal entry in the VCD dictionary.
  * Populated from the parsed VCD file and used to build the search tree.
  */
-export interface VcdSignalEntry {
+interface VcdSignalEntry {
   uid: number;
   tid: string;
   name: string;
@@ -148,7 +148,7 @@ export class WtSearch {
 
   /** Load a signal dictionary from the parsed VCD file. */
   @Method()
-  async load(dict: VcdSignalEntry[]): Promise<void> {
+  async load(dict: any[]): Promise<void> {
     this.signalDict = dict;
     this.allTypes = [];
     for (const entry of this.signalDict) {
@@ -189,25 +189,28 @@ export class WtSearch {
   }
 
   /** Mark signals as disabled (already added to workspace). */
-  @Method()
-  async disable(ids: number[], all: boolean = false): Promise<void> {
+  markDisabled(ids: number[]): void {
     this.el.shadowRoot!.querySelectorAll('#signals li').forEach((li: Element) => {
       const uid = +(li as HTMLElement).id.replace('sig-', '');
-      if (ids.includes(uid) || all) {
+      if (ids.includes(uid)) {
         li.classList.add('disabled');
       }
     });
   }
 
   /** Restore previously disabled signals. */
-  @Method()
-  async restore(ids: number[], all: boolean = false): Promise<void> {
+  restore(ids: number[]): void {
     this.el.shadowRoot!.querySelectorAll('#signals li.disabled').forEach((li: Element) => {
       const uid = +(li as HTMLElement).id.replace('sig-', '');
-      if (ids.includes(uid) || all) {
+      if (ids.includes(uid)) {
         li.classList.remove('disabled');
       }
     });
+  }
+
+  /** Update the visible signal count label. */
+  updateSignalCount(): void {
+    this.signalDict = [...this.signalDict];
   }
 
   // -------------------------------------------------------- Internal logic

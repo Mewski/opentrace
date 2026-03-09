@@ -183,3 +183,28 @@ export interface AppConfig {
   window: WindowConfig;
   [key: string]: unknown;
 }
+
+// ---------------------------------------------------------------------------
+// Zoom target enum  (was the minified enum `hu`)
+// ---------------------------------------------------------------------------
+
+export enum ZoomTarget {
+  Mouse = 'mouse',
+  Cursor = 'cursor',
+  Center = 'center',
+}
+
+// ---------------------------------------------------------------------------
+// Viewport data passed between canvas and nav
+// ---------------------------------------------------------------------------
+
+export interface Viewport {
+  x: number;
+  y: number;
+  xscale: number;
+  yscale?: number;
+  width: number;
+  height: number;
+  length: number;
+  timescale: number;
+}
